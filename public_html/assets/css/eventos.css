@@ -1,0 +1,202 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Estilos del contenedor principal */
+.container {
+    max-width: 800px;
+    margin: auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Permite scroll horizontal si es necesario */
+}
+
+/* Botón principal */
+#btn-agregar {
+    display: block;
+    width: 100%;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 20px;
+}
+
+#btn-agregar:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos del formulario */
+.formulario label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    color: #333;
+}
+
+.formulario input[type="text"],
+.formulario textarea,
+.formulario select,
+.formulario input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+}
+
+.formulario textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* Contenedor de recintos */
+.recinto-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #f7f9fc;
+}
+
+.recinto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+.funciones-container{
+    display: flex;
+    flex-direction: column;
+}
+/* Contenedor de funciones */
+
+
+.funciones-container input[type="datetime-local"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+/* Estilos de la tabla */
+table {
+    width: 100%;
+    max-width: 100%; /* Asegura que la tabla no exceda el ancho del contenedor */
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    word-wrap: break-word; /* Ajusta el texto dentro de celdas */
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Botones */
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn {
+    background-color: #007BFF;
+    color: white;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.agregar-funcion {
+    background-color: #2ecc71;
+}
+
+.agregar-funcion:hover {
+    background-color: #27ae60;
+}
+
+.eliminar-funcion {
+    background-color: #e74c3c;
+    padding: 5px 10px;
+    margin-left: 10px;
+}
+
+.eliminar-funcion:hover {
+    background-color: #c0392b;
+}
+
+.eliminar-recinto {
+    background-color: #e74c3c;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+}
+
+.eliminar-recinto:hover {
+    background-color: #c0392b;
+}
+
+/* Botones de enviar y cancelar */
+.formulario .btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.formulario button[type="submit"] {
+    background-color: #3498db;
+}
+
+.formulario button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+.formulario button[type="button"] {
+    background-color: #95a5a6;
+    margin-top: 10px;
+}
+
+.formulario button[type="button"]:hover {
+    background-color: #7f8c8d;
+}
