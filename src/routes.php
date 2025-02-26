@@ -6,6 +6,7 @@ require_once __DIR__ . '/controllers/PagoController.php';
 require_once __DIR__ . '/controllers/TipoAsientoController.php';
 require_once __DIR__ . '/controllers/AsientoController.php';
 require_once __DIR__ . '/controllers/TokenController.php';
+require_once __DIR__ . '/controllers/CompraController.php';
 
 $basePath = "/administrador/public_html";
 $eventoController = new EventoController();
@@ -14,6 +15,7 @@ $pagoController = new PagoController();
 $tipoController = new TipoAsientoController();
 $asientoController = new AsientoController();
 $tokenController = new TokenController();
+$compraController = new CompraController();
 $uri = trim(str_replace($basePath, '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)), "/");
 
 if(!empty($_SESSION['datos-token'])){
@@ -57,6 +59,11 @@ if(!empty($_SESSION['datos-token'])){
         $permisos = $tokenController->validarToken($_SESSION['datos-token']);
         verificacionAcceso($permisos);
         $asientos = $asientoController->obtenerTodos();
+    } 
+    else if ($uri =='perfil_protegido/compra.php') {
+        $permisos = $tokenController->validarToken($_SESSION['datos-token']);
+        verificacionAcceso($permisos);
+        $eventos = $eventoController->listar();
     } 
     // Manejo de error 404
     else {

@@ -181,50 +181,107 @@ document.getElementById('addSeatForm').addEventListener('submit', function(event
         });
     }
 });
-
-
-    // Lgica para agregar nuevas zonas
-const agregarZonaBtn = document.getElementById("agregarZonaBtn");
-const zonasContainer = document.getElementById("zonasContainer");
 const checkboxContainer = document.getElementById('checkboxContainer');
+const inputsContainer = document.getElementById('inputsContainer'); // Contenedor para los inputs dinámicos
+
+if (!checkboxContainer || !inputsContainer) {
+    console.error('Contenedor no encontrado');
+    return;
+}
 
 // Generar casillas de verificación de A a Z
-for (let i = 65; i <= 90; i++) { // 65 es 'A' y 90 es 'Z' en ASCII
+for (let i = 65; i <= 90; i++) {
     const letra = String.fromCharCode(i);
-    
-    // Crear un elemento de casilla de verificacin
+
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.name = 'filas';
     checkbox.value = letra;
     checkbox.id = letra;
 
-    // Crear una etiqueta para la casilla
     const label = document.createElement('label');
     label.htmlFor = letra;
     label.textContent = letra;
 
-    // Agregar la casilla y la etiqueta al contenedor
+    checkbox.addEventListener('change', function () {
+        manejarInputsAsientos();
+    });
+
     checkboxContainer.appendChild(checkbox);
     checkboxContainer.appendChild(label);
-    checkboxContainer.appendChild(document.createElement('br')); // Salto de línea
+    checkboxContainer.appendChild(document.createElement('br'));
 }
 
-// Agregar la casilla de verificacin para la letra Ñ
-const letran = '';
+// Agregar casilla para la letra Ñ
 const checkboxn = document.createElement('input');
 checkboxn.type = 'checkbox';
 checkboxn.name = 'filas';
-checkboxn.value = letran;
-checkboxn.id = letran;
+checkboxn.value = 'Ñ';
+checkboxn.id = 'Ñ';
 
 const labeln = document.createElement('label');
-labeln.htmlFor = letran;
-labeln.textContent = letran;
+labeln.htmlFor = 'Ñ';
+labeln.textContent = 'Ñ';
+
+checkboxn.addEventListener('change', function () {
+    manejarInputsAsientos();
+});
 
 checkboxContainer.appendChild(checkboxn);
 checkboxContainer.appendChild(labeln);
-checkboxContainer.appendChild(document.createElement('br')); // Salto de línea para la 
+checkboxContainer.appendChild(document.createElement('br'));
+
+// Función para agregar o eliminar inputs según la selección de checkboxes
+function manejarInputsAsientos() {
+    const selectedCheckboxes = Array.from(document.querySelectorAll('input[name="filas"]:checked'));
+
+    // Limpiar inputs existentes antes de agregar nuevos
+    inputsContainer.innerHTML = '';
+
+    // Si hay checkboxes seleccionados, crear los inputs correspondientes
+    selectedCheckboxes.forEach((cb) => {
+        const div = document.createElement('div');
+        div.classList.add('flex-container');
+        div.id = `input-container-${cb.value}`;
+
+        // Crear input para asientoInicio
+        const divInicio = document.createElement('div');
+        const labelInicio = document.createElement('label');
+        labelInicio.textContent = `Asientos desde (${cb.value}):`;
+        const inputInicio = document.createElement('input');
+        inputInicio.type = 'number';
+        inputInicio.min = '1';
+        inputInicio.max = '30';
+        inputInicio.classList.add('asientoInicio');
+        inputInicio.dataset.fila = cb.value;
+
+        divInicio.appendChild(labelInicio);
+        divInicio.appendChild(inputInicio);
+
+        // Crear input para asientoFin
+        const divFin = document.createElement('div');
+        const labelFin = document.createElement('label');
+        labelFin.textContent = `hasta (${cb.value}):`;
+        const inputFin = document.createElement('input');
+        inputFin.type = 'number';
+        inputFin.min = '1';
+        inputFin.max = '30';
+        inputFin.classList.add('asientoFin');
+        inputFin.dataset.fila = cb.value;
+
+        divFin.appendChild(labelFin);
+        divFin.appendChild(inputFin);
+
+        // Agregar inputs al contenedor
+        div.appendChild(divInicio);
+        div.appendChild(divFin);
+        inputsContainer.appendChild(div);
+    });
+}
+
+// Código para agregar una zona
+const agregarZonaBtn = document.getElementById('agregarZonaBtn');
+const zonasContainer = document.getElementById('zonasContainer');
 
 agregarZonaBtn.addEventListener('click', () => {
     const tipoAsientoId = document.getElementById("tipoAsiento_s").value;
@@ -232,8 +289,8 @@ agregarZonaBtn.addEventListener('click', () => {
     const nombreZona = document.querySelector(".zona_nombre").value;
     const filasSeleccionadas = Array.from(document.querySelectorAll('input[name="filas"]:checked'))
                                     .map(fila => fila.value);
-    const asientosInicio = parseInt(document.getElementById("asientosInicio").value);
-    const asientosFin = parseInt(document.getElementById("asientosFin").value);
+    const asientosInicio = parseInt(document.querySelector(".asientoInicio").value);
+    const asientosFin = parseInt(document.querySelector(".asientoFin").value);
 
     if (nombreZona && filasSeleccionadas.length > 0 && asientosInicio > 0 && asientosFin > 0 && asientosFin >= asientosInicio) {
         const zonaDiv = document.createElement("div");
@@ -268,7 +325,7 @@ agregarZonaBtn.addEventListener('click', () => {
                 filaTd.textContent = fila;
                 filaTr.appendChild(filaTd);
 
-                // Columna del nmero de asiento
+                // Columna del número de asiento
                 const asientoTd = document.createElement("td");
                 asientoTd.textContent = i;
                 filaTr.appendChild(asientoTd);
@@ -288,7 +345,7 @@ agregarZonaBtn.addEventListener('click', () => {
         });
         tabla.appendChild(cuerpoTabla);
 
-        // Botn para eliminar la zona
+        // Botón para eliminar la zona
         const eliminarBtn = document.createElement("button");
         eliminarBtn.textContent = "Eliminar Zona";
         eliminarBtn.onclick = function() {
@@ -302,11 +359,11 @@ agregarZonaBtn.addEventListener('click', () => {
         // Limpiar y cerrar el modal
         document.querySelector(".zona_nombre").value = "";
         document.querySelectorAll('input[name="filas"]:checked').forEach(cb => cb.checked = false);
-        document.getElementById("asientosInicio").value = "";
-        document.getElementById("asientosFin").value = "";
+        document.querySelector(".asientoInicio").value = "";
+        document.querySelector(".asientoFin").value = "";
         zonaModal.style.display = "none";
     } else {
-        alert("Por favor, complete todos los campos y asegúrese de que el rango de asientos es vlido.");
+        alert("Por favor, complete todos los campos y asegúrese de que el rango de asientos es válido.");
     }
 });
 
@@ -353,11 +410,11 @@ document.getElementById("obtenerDatosBtn").onclick = async function() {
             body: JSON.stringify(dataAsientos), 
         });
 
-        const resultado = await response.text(); 
+        const resultado = await response.json(); 
         console.log(resultado)
         if (resultado.exito) {
             alert("Datos enviados correctamente.");
-            window.location.href="asientos.php"
+            window.location.href="./asientos.php"
         } else {
             alert("Error al enviar los datos.");
         }

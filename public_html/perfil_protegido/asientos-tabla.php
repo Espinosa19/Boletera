@@ -13,73 +13,141 @@ require dirname(__DIR__,2) . "/src/routes.php";
     <title>Gestión de Asientos</title>
     <link rel="stylesheet" href="css/estilos.css">
     <style>
+        /* Estilos generales */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
             margin: 0;
             padding: 20px;
         }
+        
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
+            max-width: 1100px;
+            margin: auto;
+            background: #fff;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
+            color: #333;
             margin-bottom: 20px;
         }
+
+        /* Barra de búsqueda */
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        /* Tabla */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         table, th, td {
             border: 1px solid #ddd;
         }
+
         th, td {
-            padding: 12px;
-            text-align: left;
+            padding: 14px;
+            text-align: center;
         }
+
         th {
-            background-color: #f2f2f2;
-        }
-        .btn {
-            padding: 10px;
-            background-color: #007bff;
+            background: #007bff;
             color: white;
+            font-size: 16px;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        tr:hover {
+            background: #f1f1f1;
+        }
+
+        /* Botones */
+        .btn {
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 14px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
+
         .btn-success {
             background-color: #28a745;
+            color: white;
         }
+
         .btn-success:hover {
             background-color: #218838;
         }
-        form {
-            display: inline;
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        /* Estilos para select */
+        select {
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+            background: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .btn {
+                padding: 8px;
+                font-size: 12px;
+            }
         }
     </style>
-</head>
-<body>
+</head><body>
     <div class="container">
         <h1>Gestión de Asientos</h1>
-        <input type="text" id="searchInput" placeholder="Buscar asiento..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        
+        <!-- Barra de búsqueda -->
+        <input type="text" id="searchInput" placeholder="Buscar asiento..." onkeyup="filtrarAsientos()">
 
-        <a href="crear_asientos.php" class="btn btn-success">Agregar Nuevo Asiento</a>
+        <!-- Botón para agregar nuevo asiento -->
+        <a href="./asientos.php" class="btn btn-success">Agregar Nuevo Asiento</a>
+        
         <table>
             <thead>
                 <tr>
@@ -93,35 +161,35 @@ require dirname(__DIR__,2) . "/src/routes.php";
                 </tr>
             </thead>
             <tbody id="asientosTable">
-            <?php foreach ($asientos as $asiento): ?>
+                <?php foreach ($asientos as $asiento): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($asiento['nombre_recinto']); ?></td> <!-- Mostrar nombre del recinto -->
+                    <td><?php echo htmlspecialchars($asiento['nombre_recinto']); ?></td>
                     <td><?php echo htmlspecialchars($asiento['tipo_asiento']['nombre']); ?></td>
                     <td><?php echo htmlspecialchars($asiento['zona']); ?></td>
                     <td><?php echo htmlspecialchars($asiento['fila']); ?></td>
                     <td><?php echo htmlspecialchars($asiento['numero']); ?></td>
-                    <td><?php echo htmlspecialchars($asiento['estado']); ?></td>
                     <td>
-                        <!-- Botón para editar el estado del asiento -->
-                        
-                           
-                            <select name="nuevo_estado">
-                                <option value="disponible" <?php echo $asiento['estado'] == 'disponible' ? 'selected' : ''; ?>>Disponible</option>
-                                <option value="reservado" <?php echo $asiento['estado'] == 'reservado' ? 'selected' : ''; ?>>Reservado</option>
-                                <option value="vendido" <?php echo $asiento['estado'] == 'vendido' ? 'selected' : ''; ?>>Vendido</option>
-                            </select>
-                        </td>
-                        <td>
                         <form method="POST" action="./apis/apia.php">
-                        <button value="<?php echo $asiento['_id']; ?>" name="id" id="editar-asiento">Editar</button>
+                            <select name="nuevo_estado">
+                                <option value="Disponible" <?php echo $asiento['estado'] == 'Disponible' ? 'selected' : ''; ?>>Disponible</option>
+                                <option value="Reservado" <?php echo $asiento['estado'] == 'Reservado' ? 'selected' : ''; ?>>Reservado</option>
+                                <option value="Vendido" <?php echo $asiento['estado'] == 'Vendido' ? 'selected' : ''; ?>>Vendido</option>
+                            </select>
+                            <button class="btn btn-edit" value="<?php echo $asiento['_id']; ?>" name="id">Actualizar</button>
                         </form>
-                            <button class="btn btn-danger" id="eliminar-asiento" value="<?php echo $asiento['_id']; ?>">Eliminar</button>
+                    </td>
+                    <td>
+                        <form method="POST" action="./apis/apia.php">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button class="btn btn-danger" name="id" value="<?php echo $asiento['_id']; ?>">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
     
     <script src="./../assets/js/asientos-tabla.js"></script>
 </body>

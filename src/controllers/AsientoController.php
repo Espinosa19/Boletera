@@ -44,6 +44,10 @@ class AsientoController
     public function obtenerPorId($id){
         return $this->asientoModel->obtenerPorId($id);
     }
+    
+    public function obtenerRecintoFuncion($recinto,$funcion){
+        return $this->asientoModel->obtenerRecintoFuncion($recinto,$funcion);
+    }
     public function modificarAsiento($asiento)
     {
         try {
@@ -78,7 +82,10 @@ class AsientoController
         $this->asientoModel->insertarAsiento($recintoId, $tipoAsiento, $funcion_even, $zona, $asiento);
         return ['status' => 'create'];
     }
-
+    public function modificarEstado($id,$estado){
+        $this->asientoModel->modificarEstado($id,$estado);
+        return ['status'=>'modificar'];
+    }
     private function validarDatosGenerales($data)
     {
         if (empty($data['tiposAsientos']) || empty($data['recintoId']) || empty($data['funcionId'])) {
@@ -106,4 +113,61 @@ class AsientoController
             return ['error' => $e->getMessage()];
         }
     }
+    public function findAvailableSeatsInZone($chosenZone, $recintoId) {
+        
+        return $this->asientoModel->findAvailableSeatsInZone($chosenZone,$recintoId);
+    }
+
+    /**
+     * Reservar múltiples asientos para un usuario
+     */
+    public function reserveSeats($chosenZone, $recintoId, $requestedSeats, $userId) {
+        $availableSeats = $this->findAvailableSeatsInZone($chosenZone, $recintoId);
+        $availableSeatsArray = $availableSeats;
+
+        if (count($availableSeatsArray) < $requestedSeats) {
+            return ["success" => false, "message" => "No hay suficientes asientos disponibles."];
+        }
+
+        $seatIdsToReserve = [];
+        foreach ($availableSeatsArray as $asiento) {
+            $seatIdsToReserve[] = $asiento['_id'];
+            if (count($seatIdsToReserve) == $requestedSeats) {
+                break;
+            }
+        }
+
+        return $this->reserveMultipleSeats($seatIdsToReserve, $userId);
+    }
+
+    /**
+     * Lógica para marcar los asientos como reservados con tiempo de expiración
+     */
+    private function reserveMultipleSeats($seatIdsToReserve, $userId) {
+        $reservasExitosas = 0;
+        $asientosModificados = [];
+       
+        foreach ($seatIdsToReserve as $seatId) {
+            $resultado = $this->asientoModel->buscarModificar($seatId,$userId);
+            
+            if ($resultado) {
+                $reservasExitosas++;
+                $asientosModificados[] = [
+                    '_id' => (string) $resultado['_id'],
+                    'zona' => $resultado['zona'],
+                    'fila'=>$resultado['fila'],
+                    'asiento'=>(string)$resultado['numero'],
+                    'tipo'=>$resultado['tipo_asiento']['nombre']
+                ];
+            }
+        }
+    
+        return [
+            "success" => $reservasExitosas === count($seatIdsToReserve),
+            "reservados" => $reservasExitosas,
+            "asientos" => $asientosModificados
+        ];
+    }
+    
+
 }

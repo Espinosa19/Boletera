@@ -22,6 +22,9 @@ class Asiento
     public function obtenerPorId($id){
         return $this->collection->findOne(['_id'=>new ObjectId($id)]);
     }
+    public function obtenerRecintoFuncion($recinto,$funcion){
+        return $this->collection->find(['recinto_id'=>new ObjectId($recinto),'funcion'=>new ObjectId($funcion)])->toArray();
+    }
     public function insertarAsiento($recintoId, $tipoAsiento, $funcion_even, $zona, $asiento)
     {
         try {
@@ -54,7 +57,47 @@ class Asiento
             throw new Exception('Error al insertar el asiento: ' . $e->getMessage());
         }
     }
-
+    public function findAvailableSeatsInZone($chosenZone, $recintoId) {
+        return $this->collection->find([
+            'zona' => $chosenZone,
+            'recinto_id' =>new ObjectId($recintoId),
+            'estado' => 'Disponible',
+            'ocupado' => false,
+            'vendido'=>false
+        ])->toArray();
+    }public function buscarModificar($seatId, $userId) {
+        $resultado = $this->collection->findOneAndUpdate(
+            ['_id' => new \MongoDB\BSON\ObjectId($seatId), 'estado' => 'Disponible', 'ocupado' => false],
+            ['$set' => [
+                'estado' => 'Vendido',
+                'reservado_por' => $userId,
+                'reservado_en' => new \MongoDB\BSON\UTCDateTime(),
+                'ocupado' => true,
+                'vendido' => true
+            ]],
+            ['returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER]
+        );
+    
+        if ($resultado) {
+            return $resultado; // Devuelve el documento actualizado
+        } else {
+            return ['error' => 'El asiento ya fue reservado o no existe'];
+        }
+    }
+    
+    public function modificarEstado($id, $estado) {
+        // Asegúrate de que el valor de $estado sea el que deseas (por ejemplo, "Disponible")
+        $updatedAsiento = [
+            'estado' => $estado // Cambia el estado del asiento
+        ];
+    
+        // Realiza la actualización del documento con el ID proporcionado
+        $this->collection->updateOne(
+            ['_id' => new ObjectId($id)],  // Filtra por el ID del asiento
+            ['$set' => $updatedAsiento]     // Establece el nuevo valor para el campo "estado"
+        );
+    }
+    
     public function modificarAsiento($recintoId, $tipoAsientoId, $funcion_even, $zona, $asiento)
     {
         try {

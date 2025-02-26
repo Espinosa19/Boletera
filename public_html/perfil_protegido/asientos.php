@@ -60,6 +60,8 @@ require dirname(__DIR__,2) . "/src/routes.php";
             padding: 20px;
             border-radius: 10px;
             margin: 0% auto;
+            max-height: 544px;
+    overflow-y: auto;
             width: 40%;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
         }
@@ -237,21 +239,15 @@ require dirname(__DIR__,2) . "/src/routes.php";
 
         <label for="filasZona">Selecciona letras de filas (A-Z):</label><br>
         <div id="checkboxContainer"></div>
-        
 
-         <div class="flex-container">
-             <div>
-                <label for="asientosInicio">Asientos desde:</label>
-                <input type="number" id="asientosInicio" min="1" max="30">
-             </div>
-             <div>
-                <label for="asientosFin">hasta:</label>
-                <input type="number" id="asientosFin" min="1" max="30">
-             </div>
-         </div>
+<h2>Selecciona los asientos:</h2>
+<!-- Contenedor para los inputs dinámicos -->
+<div id="inputsContainer"></div>
         <button id="agregarZonaBtn">Aceptar</button>
         <button id="closeModalBtn">Cerrar</button>
     </div>
 </div>
+<script src="../assets/js/crud_asientos.js"></script>
+
 </body>
 </html>

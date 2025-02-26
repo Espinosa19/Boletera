@@ -33,7 +33,10 @@ class EventoController {
         }
         return $evento;
     }
-
+    public function listar() {
+        $eventos = $this->eventoModel->obtenerEventos();
+        return $eventos;
+    }
     /**
      * Obtener eventos por ID de recinto
      */

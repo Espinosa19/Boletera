@@ -19,7 +19,7 @@ class Pago {
     }
 
     public function insert($data) {
-        $this->collection->insertOne($data);
+        return $this->collection->insertOne($data);
     }
 
     public function update($id, $data) {
