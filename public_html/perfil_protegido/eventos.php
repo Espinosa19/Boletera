@@ -31,6 +31,9 @@ require dirname(__DIR__,2) . "/src/routes.php";
                 <label>Descripción:</label>
                 <textarea id="descripcion" name="descripcion" required></textarea>
 
+                <label for="recomendado">Recomendado:</label>
+<input type="checkbox" name="recomendado" id="recomendado">
+
                 <label>Subir Imagen:</label>
                 <input type="file" name="imagen" accept="image/*" id="imagen">
                 
@@ -114,8 +117,8 @@ require dirname(__DIR__,2) . "/src/routes.php";
                     ?>
                 </td>
                 <td>
-                    <button onclick="editarEvento('<?php echo $evento['_id']; ?>')">Editar</button>
-                    <button onclick="eliminarEvento('<?php echo $evento['_id']; ?>')">Eliminar</button>
+                <button onclick="editarEvento('<?php echo (string) $evento['_id']; ?>')">Editar</button>
+                <button onclick="eliminarEvento('<?php echo $evento['_id']; ?>')">Eliminar</button>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -123,6 +126,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
 </table>
 
     </div>
-<script src="../assets/js/proceso_eve.js"></script>
+<script src="../assets/js/proceso_evento.js"></script>
 </body>
 </html>

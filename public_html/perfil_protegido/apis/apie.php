@@ -10,20 +10,27 @@ $respuesta="";
 
 switch ($request_method) {
     case "GET":
-        $respuesta = $eventos->listarEventos();
-        echo json_encode($respuesta);
+        // Suponiendo que $eventos es el objeto que maneja la base de datos
+        $respuestas = $eventos->listarEventos();  // Obtener los eventos
+        
+        foreach ($respuestas['eventos'] as &$evento) {
+            $evento['_id'] = (string)$evento['_id']; 
+        }
+        echo json_encode($respuestas['eventos'][0]);
+    
+        // Devolver la respuesta en formato JSON
         break;
-
+    
     case "POST": 
         if (isset($datos['id'])) { // Si ID está presente, obtener el recinto
             $respuesta = $eventos->verEvento($datos['id']);
+            
         } else { 
             if (!isset($datos['nombre'], $datos['descripcion'], $datos['recintos'])) {
                 echo json_encode(['error' => 'Faltan datos']);
                 exit();
             }
-
-            // Si no hay imagen, asigna un valor predeterminado o null
+            $recomendado = isset($datos['recomendado']) ? true : false;
             $imagen = isset($datos['imagen']) ? $datos['imagen'] : null;
 
             // Verifica si existen funciones dentro del recinto y agrega IDs
@@ -40,7 +47,7 @@ switch ($request_method) {
             }
 
             // Llama al controlador para crear el evento con los datos actualizados
-            $respuesta = $eventos->crear($datos['nombre'], $datos['descripcion'], $imagen, $datos['recintos']);
+            $respuesta = $eventos->crear($datos['nombre'], $datos['descripcion'], $imagen, $datos['recintos'],$recomendado);
         }
         echo json_encode($respuesta);
         break;

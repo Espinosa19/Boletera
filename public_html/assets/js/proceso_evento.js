@@ -37,7 +37,7 @@ function mostrarFormularioCrear() {
          eventoEnEdicion = null;
 
          // Añadir eventos a los botones de eliminar función
-     }function mostrarFormularioActualizar(id, nombre, descripcion, recintos) {
+     }function mostrarFormularioActualizar(id, nombre, descripcion, recintos,recomendado) {
         document.getElementById("primer-button").style.display="none"
  document.getElementById('formulario').hidden = false;
  document.querySelector('.recinto-header').hidden = true;
@@ -45,7 +45,7 @@ function mostrarFormularioCrear() {
  document.getElementById('titulo-formulario').innerText = 'Modificar Evento';
  document.getElementById('nombre').value = nombre;
  document.getElementById('descripcion').value = descripcion;
- 
+ document.getElementById("recomendado").checked = recomendado ;
  const funcionesContainer = document.querySelector('.funciones-container');
  funcionesContainer.innerHTML = '';
 
@@ -134,7 +134,6 @@ function mostrarFormularioCrear() {
             }
         });
         const data = await response.json();  // Almacenamos toda la respuesta
-
         // Ahora accedemos a la propiedad 'eventos' que es el array
         const eventos = data.eventos;  // Aquí accedemos correctamente al array de eventos
 
@@ -202,7 +201,7 @@ async function editarEvento(id) {
     const evento = await response.json();
     // Mostrar el objeto recibido
     console.log(evento);
- mostrarFormularioActualizar(evento._id, evento.nombre, evento.descripcion, evento.recintos);
+ mostrarFormularioActualizar(evento._id, evento.nombre, evento.descripcion, evento.recintos,evento.recomendado|| false);
 }
 function agregarFuncion(button) {
  const funcionesContainer = button.previousElementSibling;
@@ -226,8 +225,6 @@ function agregarFuncion(button) {
     const nombre = document.getElementById('nombre').value;
     const descripcion = document.getElementById('descripcion').value;
     const imagen = document.getElementById('imagen').files[0];  // Imagen seleccionada
-
-    // Obtiene los recintos y las funciones
     const recintos = document.querySelectorAll('.recinto-container');
 
     const recintosArray = Array.from(recintos).map(recinto => {
@@ -286,6 +283,7 @@ function agregarFuncion(button) {
                 descripcion: descripcion,
                 imagen: imagen ? imagen.name : null,  // Solo enviamos el nombre de la imagen
                 recintos: recintosArray,
+                recomendado: document.getElementById("recomendado").checked,  
                 _id: eventoEnEdicion || null  // Si estamos editando un evento, añadimos el ID
             })
         });

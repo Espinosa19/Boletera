@@ -34,8 +34,8 @@ class EventoController {
         return $evento;
     }
     public function listar() {
-        $eventos = $this->eventoModel->obtenerEventos();
-        return $eventos;
+        return $this->eventoModel->obtenerEventos();
+        
     }
     /**
      * Obtener eventos por ID de recinto
@@ -97,7 +97,7 @@ class EventoController {
     /**
      * Crear un nuevo evento
      */
-    public function crear($nombre, $descripcion, $imagen, $recinto) {
+    public function crear($nombre, $descripcion, $imagen, $recinto,$reco) {
         if (empty($nombre) || empty($descripcion)) {
             echo json_encode(['error' => 'Faltan datos obligatorios']);
             return;
@@ -107,7 +107,9 @@ class EventoController {
             'nombre' => $nombre,
             'descripcion' => $descripcion,
             'imagen' => $imagen ?? '',
+            'recomendado'=>$reco,
             'recintos' => $recinto ?? []
+            
         ];
 
         $resultado = $this->eventoModel->agregarEvento($datos);
