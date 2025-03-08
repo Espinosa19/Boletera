@@ -25,7 +25,7 @@ class Asiento
     public function obtenerRecintoFuncion($recinto,$funcion){
         return $this->collection->find(['recinto_id'=>new ObjectId($recinto),'funcion'=>new ObjectId($funcion)])->toArray();
     }
-    public function insertarAsiento($recintoId, $tipoAsiento, $funcion_even, $zona, $asiento)
+    public function insertarAsiento($recintoId, $tipoAsiento, $funcion_even, $zona,$fila, $asiento)
     {
         try {
             if (!$tipoAsiento) {
@@ -41,15 +41,15 @@ class Asiento
                 ],
                 'funcion' => $funcion_even,
                 'zona' => $zona,
-                'fila' => $asiento['fila'] ?? null,
-                'numero' => isset($asiento['asiento']) ? intval($asiento['asiento']) : null,
-                'ocupado' => isset($asiento['estado']) && $asiento['estado'] !== 'Disponible',
+                'fila' => $fila ?? null,
+                'numero' => isset($asiento) ? intval($asiento) : null,
+                'ocupado' => false,
                 'reservado_por' => null,
                 'reservado_en' => null,
                 'vendido' => false,
                 'vendido_en' => null,
                 'activo' => false,
-                'estado' => $asiento['estado'] ?? null
+                'estado' => "Disponible"
             ];
 
             $this->collection->insertOne($nuevoAsiento);
@@ -132,26 +132,22 @@ class Asiento
             throw new Exception('Error al eliminar el asiento: ' . $e->getMessage());
         }
     }
-    public function insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento)
+    public function insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento,$cantidad)
     {
         try {
-            $consulta_tipo = $this->collection->findOne(['_id' => $tipoAsientoId]);
-            if (!$consulta_tipo) {
-                throw new Exception('Tipo de asiento no encontrado para el ID: ' . (string) $tipoAsientoId);
-            }
-
-            for ($i = 0; $i < (int) $tipoAsiento['cantidadAsientos']; $i++) {
+           
+            for ($i = 0; $i < (int) $cantidad; $i++) {
                 $nuevoAsiento = [
                     'recinto_id' => $recintoId,
                     'tipo_asiento' => [
                         '_id' => $tipoAsientoId,
-                        'nombre' => $consulta_tipo['nombre'],
-                        'precio' => (float) $consulta_tipo['precio']
+                        'nombre' => $tipoAsiento['nombre'],
+                        'precio' => (float) $tipoAsiento['precio']
                     ],
                     'funcion' => $funcion_event,
                     'zona' => $zona,
                     'fila' => null,
-                    'numero' => $i + 1,
+                    'numero' => null,
                     'ocupado' => false,
                     'reservado_por' => null,
                     'reservado_en' => null,

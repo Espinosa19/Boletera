@@ -45,7 +45,7 @@ require dirname(__DIR__,2) . "/src/routes.php";
         }
 
         .modal {
-            display: none;
+            display: flex;
             position: fixed;
             z-index: 1;
             left: 0;
@@ -137,9 +137,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
 </head>
 <body>
 
-<h2>Gestión de Recinto</h2>
-<button id="openModalBtn">Agregar Asientos</button>
-<button id="obtenerDatosBtn">Obtener Datos de Asientos</button>
 
 
 <!-- Contenedor de la tabla generada -->
@@ -148,6 +145,8 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <!-- Modal para agregar una nueva zona -->
 <div id="zonaModal" class="modal">
     <div class="modal-content">
+    <h2>Gestión de Recinto</h2>
+
         <h2>Agregar Nueva Zona</h2>
          <div class="flex-container">
             <div>
@@ -191,17 +190,18 @@ require dirname(__DIR__,2) . "/src/routes.php";
             <div id="checkboxContainer"></div>
             <h2>Selecciona los asientos:</h2>
             <div id="inputsContainer"></div>
+            <button id="eliminar">Eliminar Zona</button>
         </div>
     </div>
     
 <!-- Contenedor para los inputs dinámicos -->
-        <button id="agregarZonaBtn">Aceptar</button>
+        <button id="obtenerDatosBtn">Agregar</button>
         <button id="agregarOtraZona">Agregar zona con asiento</button>
         <button id="agregarZonaSinAsiento">Agregar zona sin asientos</button>
         <button id="closeModalBtn">Cerrar</button>
     </div>
 </div>
-<script src="../assets/js/crud_asient.js"></script>
+<script src="../assets/js/crud_asi.js"></script>
 
 </body>
 </html>

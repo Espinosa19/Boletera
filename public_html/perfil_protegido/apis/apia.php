@@ -49,12 +49,20 @@ switch ($method) {
                 }
             } else {
                 foreach ($datas as $data) {
-                    if (isset($data['tiposAsientos'])) {
-                        echo json_encode($controller->insertarAsientosPorTipo($data));
-                    } else {
-                        echo json_encode($controller->insertarAsiento($data));
+                    if (!is_array($data)) {
+                        continue; // Si $data no es un array, evitar errores
                     }
+                
+                    if (!empty($data['datosSin'])) { // Verifica si 'datosSin' no está vacío
+                        $resultado = $controller->insertarAsientosPorTipo($data['datosSin'],$data['tipoAsientoId'],$data['recintoId'],$data['funcion_even']);
+                    } 
+                    if(!empty($data['datos'])) {
+                        $resultado = $controller->insertarAsiento($data);
+                    }
+                
+                    echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
                 }
+                
             }
             exit();
             break;

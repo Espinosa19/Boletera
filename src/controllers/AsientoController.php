@@ -71,17 +71,54 @@ class AsientoController
         }
     }
 
-    public function insertarAsiento($asiento)
+    public function insertarAsiento($asientos)
     {
-        $recintoId = new ObjectId($asiento['recintoId']);
-        $tipoAsientoId = new ObjectId($asiento['tipoAsientoId']);
-        $funcion_even = new ObjectId($asiento['funcion_even']);
-        $zona = $asiento['zona'] ?? null;
+        // Verificar si $asientos es un array y si contiene 'datos'
+        if (!isset($asientos['datos']) || !is_array($asientos['datos'])) {
+            return ['error' => 'Datos inválidos o estructura incorrecta'];
+        }
+    
+        // Convertir IDs a ObjectId
+        $recintoId = new ObjectId($asientos['recintoId']);
+        $tipoAsientoId = new ObjectId($asientos['tipoAsientoId']);
+        $funcion_even = new ObjectId($asientos['funcion_even']);
         $tipoAsiento = $this->tipoAsientoModel->obtenerPorId($tipoAsientoId);
-
-        $this->asientoModel->insertarAsiento($recintoId, $tipoAsiento, $funcion_even, $zona, $asiento);
+    
+        // Recorrer los asientos dentro de 'datos'
+        foreach ($asientos['datos'] as $asiento) {
+            // Validar que 'filas' y 'rango' existan
+            if (!isset($asiento['filas']) || !is_array($asiento['filas'])) {
+                continue; // Saltar si no hay filas
+            }
+    
+            if (!isset($asiento['rango']) || !is_numeric($asiento['rango'])) {
+                continue; // Saltar si 'rango' no es un número
+            }
+    
+            foreach ($asiento['filas'] as $fila) {
+                for ($i = 0; $i < $asiento['rango']; $i++) {
+                    $asi = $i + 1;
+                    if (isset($asiento['limitaciones'][$i]) && $asiento['limitaciones'][$i] == $asi) {
+                        continue; // Saltar si el asiento está limitado
+                    } else {
+                        $this->asientoModel->insertarAsiento(
+                            $recintoId,
+                            $tipoAsiento,
+                            $funcion_even,
+                            $asiento['zona'],
+                            $fila,
+                            $asi
+                        );
+                    }
+                }
+            }
+        }
+    
+        // Después de procesar todos los asientos, retornar el estado
         return ['status' => 'create'];
     }
+    
+    
     public function modificarEstado($id,$estado){
         $this->asientoModel->modificarEstado($id,$estado);
         return ['status'=>'modificar'];
@@ -93,14 +130,17 @@ class AsientoController
         }
     }
 
-    public function insertarAsientosPorTipo($data, $tipoAsiento)
+    public function insertarAsientosPorTipo($datas, $tipoAsientoId,$recinto_id,$funcion)
     {
-        $recintoId = new ObjectId($data['recintoId']);
-        $funcion_event = new ObjectId($data['funcionId']);
-        $zona = $data['zona'] ?? null;
-        $tipoAsientoId = new ObjectId($tipoAsiento['tipoAsientoId']);
-
-        $this->asientoModel->insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento);
+        $recintoId = new ObjectId($recinto_id);
+        $funcion_event = new ObjectId($funcion);
+        $tipoAsientoId = new ObjectId($tipoAsientoId);
+        $tipoAsiento = $this->tipoAsientoModel->obtenerPorId($tipoAsientoId);
+        foreach($datas as $data){
+            $zona=$data['nombre_zona'];
+            $cantidad=$data['cantidad'];
+            $this->asientoModel->insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento,$cantidad);
+        }
         return ['status' => 'create'];
 
     }
