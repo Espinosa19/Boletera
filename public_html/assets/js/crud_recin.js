@@ -1,153 +1,118 @@
-document.addEventListener('DOMContentLoaded', function () {  
-    
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('recinto-form');
     const tableContainer = document.getElementById('recintos-container');
     const addButton = document.getElementById('add-recinto');
     const cancelButton = document.getElementById('cancel');
-    let editingId = null; // Variable para saber si se está editando un recinto
-    let formSubmitting = false; // Para evitar envíos duplicados
+    const zonasContainer = document.getElementById('zonas-container');
+    const agregarZonaBtn = document.getElementById("agregarZona");
+    let editingId = null;
+    let formSubmitting = false;
+    let zonaCounter = 1;
 
-    // Cargar recintos al cargar la página
-    // Mostrar el formulario al hacer clic en "Agregar Recinto"
     addButton.addEventListener('click', function () {
-        form.reset(); // Limpiar el formulario
-        editingId = null; // Reiniciar el modo de edición
+        form.reset();
+        editingId = null;
         form.style.display = 'block';
         tableContainer.style.display = 'none';
         addButton.style.display = 'none';
     });
-    
-    // Ocultar el formulario y mostrar la tabla al hacer clic en "Cancelar"
+
     cancelButton.addEventListener('click', function () {
         form.style.display = 'none';
         tableContainer.style.display = 'block';
         addButton.style.display = 'inline-block';
     });
-    let zonaCounter=1
-     document.getElementById("agregarZona").addEventListener("click",()=>{
+
+    agregarZonaBtn.addEventListener("click", () => {
         zonaCounter++;
-        const zonasContainer = document.getElementById('zonas-container');
         const zonaDiv = document.createElement('div');
         zonaDiv.classList.add('zona');
-        
         zonaDiv.innerHTML = `
-            <label for="nombre_zona_${zonaCounter}">Nombre de la Zona:</label>
-            <input type="text" id="nombre_zona_${zonaCounter}" name="nombre_zona[]" required><br>
+            <label>Nombre de la Zona:</label>
+            <input type="text" name="nombre_zona[]" required><br>
 
-            <label for="tipo_${zonaCounter}">Tipo:</label>
-            <select id="tipo_${zonaCounter}" name="tipo[]" required>
+            <label>Tipo:</label>
+            <select name="tipo[]" required>
                 <option value="">Selecciona un tipo</option>
                 <option value="Asiento">Asiento</option>
                 <option value="Pie">Pie</option>
             </select><br>
 
-            <label for="capacidad_zona_${zonaCounter}">Capacidad:</label>
-            <input type="number" id="capacidad_zona_${zonaCounter}" name="capacidad_zona[]" required><br>
+            <label>Capacidad:</label>
+            <input type="number" name="capacidad_zona[]" required><br>
 
-            <label for="precio_default_${zonaCounter}">Precio Default:</label>
-            <input type="number" id="precio_default_${zonaCounter}" name="precio_default[]" required><br>
+            <label>Precio Default:</label>
+            <input type="number" name="precio_default[]" required><br>
 
-            <label for="descripcion_${zonaCounter}">Descripción:</label>
-            <textarea id="descripcion_${zonaCounter}" name="descripcion[]" required></textarea><br>
+            <label>Descripción:</label>
+            <textarea name="descripcion[]" required></textarea><br>
 
             <input type="hidden" name="id_zona[]" value="">
         `;
         zonasContainer.appendChild(zonaDiv);
-    
-    })
-   
-    document.getElementById('mapa_svg_url').addEventListener('input', function() {
+    });
+
+    document.getElementById('mapa_svg_url').addEventListener('input', function () {
         document.getElementById('mapa_svg_file').disabled = this.value.trim() !== '';
     });
-    
-    document.getElementById('mapa_svg_file').addEventListener('change', function() {
+
+    document.getElementById('mapa_svg_file').addEventListener('change', function () {
         document.getElementById('mapa_svg_url').disabled = this.files.length > 0;
     });
-    // Manejar la accin de guardar (crear o actualizar)
 
-    form.addEventListener('submit', async function (event) { 
-        event.preventDefault(); // Prevenir recarga de la página
-    
-        if (formSubmitting) return; // Evitar múltiples envíos
-        formSubmitting = true; // Bloquear hasta completar el envío
-    
-        // Recopilar datos del formulario principal
+    // Manejar la accin de guardar (crear o actualizar)
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if (formSubmitting) return;
+        formSubmitting = true;
+
         const formData = {
-            id: editingId || null, // Incluir ID en PUT
-            nombre: document.getElementById('nombre').value.trim(),
-            ciudad: document.getElementById('ciudad').value.trim(),
-            estado: document.getElementById('estado').value.trim(),
-            capacidad: parseInt(document.getElementById('capacidad').value.trim(), 10),
-            activo: document.getElementById('activo').checked,
-            mapa_svg_url: document.getElementById('mapa_svg_url').value.trim(),
-            mapa_svg_data: null, // Para almacenar el SVG en base64 si se carga un archivo
+            id: editingId || null,
+            nombre: form.nombre.value.trim(),
+            ciudad: form.ciudad.value.trim(),
+            estado: form.estado.value.trim(),
+            capacidad: parseInt(form.capacidad.value.trim(), 10),
+            activo: form.activo.checked,
+            mapa_svg_url: form.mapa_svg_url.value.trim(),
+            mapa_svg_data: null,
             zonas: []
         };
-    
-        // Comprobar si el campo de URL está vacío y el archivo SVG fue cargado
+
         if (!formData.mapa_svg_url) {
-            const svgFileInput = document.getElementById('mapa_svg_file');
-            const svgFile = svgFileInput.files[0];
-    
+            const svgFile = form.mapa_svg_file.files[0];
             if (svgFile) {
                 formData.mapa_svg_data = await convertFileToBase64(svgFile);
             }
         }
-    
-        // Recopilar datos de cada zona
-        const zonasContainer = document.getElementById('zonas-container');
-        const zonasDivs = zonasContainer.getElementsByClassName('zona');
-        
-        for (let zonaDiv of zonasDivs) {
-            const zonaData = {
-                nombre_zona: zonaDiv.querySelector(`[id^=nombre_zona]`).value.trim(),
-                tipo: zonaDiv.querySelector(`[id^=tipo]`).value,
-                capacidad: parseInt(zonaDiv.querySelector(`[id^=capacidad_zona]`).value.trim(), 10),
-                precio_default: parseFloat(zonaDiv.querySelector(`[id^=precio_default]`).value.trim()),
-                descripcion: zonaDiv.querySelector(`[id^=descripcion]`).value.trim()
-            };
-            formData.zonas.push(zonaData);
-        }
-    
-        // Validaciones antes de enviar
-        const validationErrors = validateForm(formData);
-    
-        if (validationErrors.length > 0) {
-            displayValidationErrors(validationErrors);
-            formSubmitting = false; // Permitir que se pueda volver a enviar tras corrección
-            return; // No continuar si hay errores
-        }
-    
-        const url = './apis/apir.php' + (editingId ? `?id=${editingId}` : '');
-        const method = editingId ? 'PUT' : 'POST';
-    
-        // Enviar datos al servidor
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData),
-                credentials: "same-origin" // Ayuda con la autenticación en algunos servidores
+
+        document.querySelectorAll('.zona').forEach(zonaDiv => {
+            formData.zonas.push({
+                nombre_zona: zonaDiv.querySelector('[name="nombre_zona[]"]').value.trim(),
+                tipo: zonaDiv.querySelector('[name="tipo[]"]').value,
+                capacidad: parseInt(zonaDiv.querySelector('[name="capacidad_zona[]"]').value.trim(), 10),
+                precio_default: parseFloat(zonaDiv.querySelector('[name="precio_default[]"]').value.trim()),
+                descripcion: zonaDiv.querySelector('[name="descripcion[]"]').value.trim()
             });
-    
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.status}`);
-            }
-    
-            const responseData = await response.json();
-            console.log(responseData);
-            
+        });
+
+        try {
+            const response = await fetch('./apis/apir.php' + (editingId ? `?id=${editingId}` : ''), {
+                method: editingId ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+                credentials: "same-origin"
+            });
+            if (!response.ok) throw new Error(`Error en la solicitud: ${response.status}`);
+            await response.json();
             loadRecintos();
             resetForm();
         } catch (error) {
             console.error('Error:', error);
         } finally {
-            formSubmitting = false; // Permitir futuros envíos
+            formSubmitting = false;
         }
     });
-    
+
 
 // Función para convertir el archivo a Base64
 function convertFileToBase64(file) {
@@ -369,20 +334,20 @@ function addZoneToForm(zona, index) {
     // Crear los campos para la zona
     zoneDiv.innerHTML = `
         <h4>Zona ${index + 1}</h4>
-        <label for="nombre_zona_${index}">Nombre de Zona:</label>
-        <input type="text" id="nombre_zona_${index}" name="nombre_zona[]" value="${zona.nombre_zona}" required>
+        <label for="nombre_zona">Nombre de Zona:</label>
+        <input type="text" id="nombre_zona" name="nombre_zona[]" value="${zona.nombre_zona}" required>
 
-        <label for="descripcion_${index}">Descripción:</label>
-        <input type="text" id="descripcion_${index}" name="descripcion[]" value="${zona.descripcion}" required>
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripcion" name="descripcion[]" value="${zona.descripcion}" required>
 
-        <label for="capacidad_${index}">Capacidad:</label>
-        <input type="number" id="capacidad_${index}" name="capacidad[]" value="${zona.capacidad}" required>
+        <label for="capacidad">Capacidad:</label>
+        <input type="number" id="capacidad_zona" name="capacidad_zona[]" value="${zona.capacidad}" required>
 
-        <label for="tipo_${index}">Tipo:</label>
-        <input type="text" id="tipo_${index}" name="tipo[]" value="${zona.tipo}" required>
+        <label for="tipo">Tipo:</label>
+        <input type="text" id="tipo" name="tipo[]" value="${zona.tipo}" required>
 
-        <label for="precio_default_${index}">Precio Default:</label>
-        <input type="number" id="precio_default_${index}" name="precio_default[]" value="${zona.precio_default}" required>
+        <label for="precio_default">Precio Default:</label>
+        <input type="number" id="precio_default" name="precio_default[]" value="${zona.precio_default}" required>
     `;
 
     // Agregar el nuevo div al contenedor de zonas

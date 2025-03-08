@@ -24,7 +24,7 @@ class CompraController {
         return $this->boletoModel->obtenerPorId($id);
     }
     public function crearBoleto($data, $taquilla) {
-        $id = uniqid(); // ID único para la compra
+        $id = new MongoDB\BSON\ObjectId(); // ID único para la compra
         $precio=$data['precio'];
         $zona = $data['zona'];
         $recintoId = $data['recinto_id'];
@@ -55,11 +55,16 @@ class CompraController {
         foreach ($asientos as $i => $asiento) {
             $boletoData = [
                 "usuario_id" => $id,
-                "evento_id" => $data['evento_id'],
-                "transaccion_id" => $transaccion,
-                "fila" => $asiento['fila'] ?? null,  
-                "asiento" => $asiento['_id'] ?? null, 
-                "tipo" => $asiento['tipo'] ?? null,
+                "evento_id" => new MongoDB\BSON\ObjectId($data['evento_id']),
+                "transaccion_id" =>new MongoDB\BSON\ObjectId($transaccion),
+                "recinto"=>[
+                    "recinto_id"=>$asiento['recinto_id']??null,
+                    "funcion_id"=>$asiento['funcion']??null,
+                    "fila" => $asiento['fila'] ?? null,  
+                    "zona"=>$asiento['zona']??null,
+                    'asiento' => (string) $asiento['numero'],  // Asegura que 'asiento' sea un string
+                    "tipo" => $asiento['tipo'] ?? null,    
+                ],
                 "metodo_pago" => $data['metodo'],
                 "clave_unica" => $token[$i] ?? null,
                 "fecha_expiracion" => null,

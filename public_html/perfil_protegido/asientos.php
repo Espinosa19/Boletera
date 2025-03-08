@@ -138,59 +138,8 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <body>
 
 <h2>Gestión de Recinto</h2>
-<button id="openModalBtn">Agregar Zona</button>
+<button id="openModalBtn">Agregar Asientos</button>
 <button id="obtenerDatosBtn">Obtener Datos de Asientos</button>
-<button id="addSeatBtn">Agregar Tipo de Boleto</button>
-<div id="addSeatModal" style="display:none;">
-    <form id="addSeatForm">
-        <div>
-            <label for="recinto">Recinto:</label>
-            <select class="recinto_id" id="recinto1" required>
-                <option value="">Seleccione un recinto</option>
-                <?php foreach ($recintos as $recinto): ?>
-                    <option value="<?php echo htmlspecialchars($recinto['_id']); ?>">
-                        <?php echo htmlspecialchars($recinto['nombre']); ?> - Ubicación: <?php echo htmlspecialchars($recinto['ciudad']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <div>
-            <label for="funcion">Función:</label>
-            <select class="funcion_id" id="funcion1" required>
-                    <option value="">Seleccione una función</option>
-                <!-- Aquí se agregarán las funciones dinámicamente según el recinto seleccionado -->
-            </select>
-        </div>
-
-        <!-- Contenedor para los tipos de asientos agregados -->
-        <div id="seatContainer">
-            <div class="seat-type-block">
-                <label for="tipoAsiento">Tipo de Asiento:</label>
-                <select class="tipo_asiento_id_p" required>
-                    <option value="">Seleccione un tipo de asiento</option>
-                    <?php foreach ($tipos as $tipoAsiento): ?>
-                        <option value="<?php echo htmlspecialchars($tipoAsiento['_id']); ?>">
-                            <?php echo htmlspecialchars($tipoAsiento['nombre']); ?> - Precio: <?php echo htmlspecialchars($tipoAsiento['precio']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <div class=zona2></div>
-
-                <label for="cantidad">Cantidad de Asientos:</label>
-                <input type="number" class="cantidad_asientos" min="1" required placeholder="Cantidad de boletos">
-            </div>
-        </div>
-        <!-- Botón para agregar un nuevo tipo de boleto -->
-        <button type="button" id="addSeatTypeBtn">Agregar Cantidad de Boleto</button>
-
-        <div>
-            <button type="submit">Guardar Boletos</button>
-            <button type="button" id="closeModalBtn2">Cerrar</button>
-        </div>
-    </form>
-</div>
-
 
 
 <!-- Contenedor de la tabla generada -->
@@ -233,21 +182,26 @@ require dirname(__DIR__,2) . "/src/routes.php";
                 <!-- Aquí se agregarán las funciones dinámicamente -->
             </select>
         </div>
+    <div id="contenedor-padre-zonas">
 
-        <label for="nombreZona">Nombre de la Zona:</label>
-        <div id="zonas"></div>
-
-        <label for="filasZona">Selecciona letras de filas (A-Z):</label><br>
-        <div id="checkboxContainer"></div>
-
-<h2>Selecciona los asientos:</h2>
+        <div class="contenedor-zonas">
+            <label for="nombreZona">Nombre de la Zona:</label>
+            <div id="zonas"></div>
+            <label for="filasZona">Selecciona letras de filas (A-Z):</label><br>
+            <div id="checkboxContainer"></div>
+            <h2>Selecciona los asientos:</h2>
+            <div id="inputsContainer"></div>
+        </div>
+    </div>
+    
 <!-- Contenedor para los inputs dinámicos -->
-<div id="inputsContainer"></div>
         <button id="agregarZonaBtn">Aceptar</button>
+        <button id="agregarOtraZona">Agregar zona con asiento</button>
+        <button id="agregarZonaSinAsiento">Agregar zona sin asientos</button>
         <button id="closeModalBtn">Cerrar</button>
     </div>
 </div>
-<script src="../assets/js/crud_asientos.js"></script>
+<script src="../assets/js/crud_asient.js"></script>
 
 </body>
 </html>

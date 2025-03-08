@@ -90,23 +90,23 @@ require dirname(__DIR__,2) . "/src/routes.php";
     <div id="zonas-container">
         <div class="zona">
             <label for="nombre_zona_1">Nombre de la Zona:</label>
-            <input type="text" id="nombre_zona_1" name="nombre_zona[]" required><br>
+            <input type="text" id="nombre_zona" name="nombre_zona[]" required><br>
 
             <label for="tipo_1">Tipo:</label>
-            <select id="tipo_1" name="tipo[]" required>
+            <select id="tipo" name="tipo[]" required>
                 <option value="">Selecciona un tipo</option>
                 <option value="Asiento">Asiento</option>
                 <option value="Pie">Pie</option>
             </select><br>
 
             <label for="capacidad_zona_1">Capacidad:</label>
-            <input type="number" id="capacidad_zona_1" name="capacidad_zona[]" required><br>
+            <input type="number" id="capacidad_zona" name="capacidad_zona[]" required><br>
 
             <label for="precio_default_1">Precio Default:</label>
-            <input type="number" id="precio_default_1" name="precio_default[]" required><br>
+            <input type="number" id="precio_default" name="precio_default[]" required><br>
 
             <label for="descripcion_1">Descripción:</label>
-            <textarea id="descripcion_1" name="descripcion[]" required></textarea><br>
+            <textarea id="descripcion" name="descripcion[]" required></textarea><br>
 
             <!-- Campo oculto para almacenar el ID de la zona si es necesario -->
             <input type="hidden" name="id_zona[]" value="">
@@ -121,7 +121,7 @@ require dirname(__DIR__,2) . "/src/routes.php";
 
 
 
-    <script src="../assets/js/crud_recintos.js"></script>
+    <script src="../assets/js/crud_recin.js"></script>
 </body>
 </html>
 
