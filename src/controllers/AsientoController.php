@@ -153,16 +153,17 @@ class AsientoController
             return ['error' => $e->getMessage()];
         }
     }
-    public function findAvailableSeatsInZone($chosenZone, $recintoId) {
+    public function findAvailableSeatsInZone($chosenZone, $recintoId,$funcion) {
         
-        return $this->asientoModel->findAvailableSeatsInZone($chosenZone,$recintoId);
+        return $this->asientoModel->findAvailableSeatsInZone($chosenZone,$recintoId,$funcion);
     }
 
     /**
      * Reservar múltiples asientos para un usuario
      */
-    public function reserveSeats($chosenZone, $recintoId, $requestedSeats, $userId) {
-        $availableSeats = $this->findAvailableSeatsInZone($chosenZone, $recintoId);
+    public function reserveSeats($chosenZone, $recintoId, $requestedSeats,$funcion , $userId) {
+        $availableSeats = $this->findAvailableSeatsInZone($chosenZone, $recintoId,$funcion);
+
         $availableSeatsArray = $availableSeats;
 
         if (count($availableSeatsArray) < $requestedSeats) {
@@ -188,17 +189,19 @@ class AsientoController
         $asientosModificados = [];
        
         foreach ($seatIdsToReserve as $seatId) {
+
             $resultado = $this->asientoModel->buscarModificar($seatId,$userId);
-            
+
             if ($resultado) {
                 $reservasExitosas++;
                 $asientosModificados[] = [
-                    '_id' => (string) $resultado['_id'],
-                    'zona' => $resultado['zona'],
-                    'fila'=>$resultado['fila'],
-                    'asiento'=>(string)$resultado['numero'],
-                    'tipo'=>$resultado['tipo_asiento']['nombre']
+                    '_id' => !empty($resultado['_id']) ? (string) $resultado['_id'] : null,
+                    'zona' => !empty($resultado['zona']) ? $resultado['zona'] : null,
+                    'fila' => !empty($resultado['fila']) ? $resultado['fila'] : null,
+                    'asiento' => !empty($resultado['numero']) ? (string)$resultado['numero'] : null,
+                    'tipo' => !empty($resultado['tipo_asiento']['nombre']) ? $resultado['tipo_asiento']['nombre'] : null
                 ];
+                
             }
         }
     

@@ -29,9 +29,9 @@ class CompraController {
         $zona = $data['zona'];
         $recintoId = $data['recinto_id'];
         $cantidad = $data['cantidad'];
-        
+        $funcion=$data['funcion'];
         // Reservar asientos
-        $resultados = $this->asientoController->reserveSeats($zona, $recintoId, $cantidad, $id);
+        $resultados = $this->asientoController->reserveSeats($zona, $recintoId, $cantidad,$funcion, $id);
         $asientos = $resultados['asientos'] ?? [];
         
         if (empty($asientos)) {
@@ -58,8 +58,8 @@ class CompraController {
                 "evento_id" => new MongoDB\BSON\ObjectId($data['evento_id']),
                 "transaccion_id" =>new MongoDB\BSON\ObjectId($transaccion),
                 "recinto"=>[
-                    "recinto_id"=>$asiento['recinto_id']??null,
-                    "funcion_id"=>$asiento['funcion']??null,
+                    "recinto_id"=>new MongoDB\BSON\ObjectId($asiento['recinto_id'])??null,
+                    "funcion_id"=>new MongoDB\BSON\ObjectId($asiento['funcion'])??null,
                     "fila" => $asiento['fila'] ?? null,  
                     "zona"=>$asiento['zona']??null,
                     'asiento' => (string) $asiento['numero'],  // Asegura que 'asiento' sea un string

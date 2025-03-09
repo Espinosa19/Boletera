@@ -494,7 +494,7 @@ document.getElementById("obtenerDatosBtn").onclick = async function() {
             body: JSON.stringify(dataAsientos),
         });
 
-        const resultado = await response.text();
+        const resultado = await response.json();
         console.log(resultado);
 
         if (resultado.exito) {

@@ -87,6 +87,8 @@ document.getElementById("boletoForm").addEventListener("submit", function (e) {
     const metodoSelect = document.getElementById("metodo");
     const mensajeDiv = document.getElementById("mensaje");
 
+    let selectedOp = recintoSelect.options[recintoSelect.selectedIndex];
+    let funcionId = selectedOp.getAttribute("data-funcion-id"); 
     const evento = eventoSelect.value;
     const recinto = recintoSelect.value;
     const zona = zonaSelect.value;
@@ -107,6 +109,7 @@ document.getElementById("boletoForm").addEventListener("submit", function (e) {
         recinto_id: recinto,
         zona: zona,
         metodo: metodo,
+        funcion:funcionId,
         cantidad: cantidad,
         precio: precio // Agregar el precio del asiento seleccionado
     };
@@ -116,8 +119,9 @@ document.getElementById("boletoForm").addEventListener("submit", function (e) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ boletos })
     })
-    .then(response => response.json())
+    .then(response => response.text())
     .then(result => {
+        console.log(result)
         if (result.success) {
             mensajeDiv.textContent = "✅ Boletos registrados.";
             mensajeDiv.style.color = "green";

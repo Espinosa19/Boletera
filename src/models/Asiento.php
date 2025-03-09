@@ -57,9 +57,10 @@ class Asiento
             throw new Exception('Error al insertar el asiento: ' . $e->getMessage());
         }
     }
-    public function findAvailableSeatsInZone($chosenZone, $recintoId) {
+    public function findAvailableSeatsInZone($chosenZone, $recintoId,$funcion) {
         return $this->collection->find([
             'zona' => $chosenZone,
+            'funcion'=>new ObjectId($funcion),
             'recinto_id' =>new ObjectId($recintoId),
             'estado' => 'Disponible',
             'ocupado' => false,
@@ -67,7 +68,7 @@ class Asiento
         ])->toArray();
     }public function buscarModificar($seatId, $userId) {
         $resultado = $this->collection->findOneAndUpdate(
-            ['_id' => new \MongoDB\BSON\ObjectId($seatId), 'estado' => 'Disponible', 'ocupado' => false],
+            ['_id' => $seatId, 'estado' => 'Disponible', 'ocupado' => false],
             ['$set' => [
                 'estado' => 'Vendido',
                 'reservado_por' => $userId,
@@ -88,7 +89,9 @@ class Asiento
     public function modificarEstado($id, $estado) {
         // Asegúrate de que el valor de $estado sea el que deseas (por ejemplo, "Disponible")
         $updatedAsiento = [
-            'estado' => $estado // Cambia el estado del asiento
+            'estado' => $estado,
+            'ocupado'=>true,
+            'vendido'=>true
         ];
     
         // Realiza la actualización del documento con el ID proporcionado
