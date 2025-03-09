@@ -73,109 +73,132 @@ class TokenController {
         }
     }
     public function generarClave($datos_zona, $evento, $id) {
-        self::init();
-
-        if (empty($evento) || empty($id)) {
-            throw new InvalidArgumentException("Faltan datos obligatorios: evento o ID del cliente.");
-        }
+        try {
+            self::init();
     
-        if (!is_array($datos_zona) || count($datos_zona) === 0) {
-            throw new InvalidArgumentException("Se requiere al menos un asiento para generar la clave del boleto.");
-        }
-    
-    
-
-        $tokens = [];
-    
-        foreach ($datos_zona as $dato) {
-            if (!isset($dato['zona'], $dato['asiento'], $dato['tipo'])) {
-                throw new InvalidArgumentException("Faltan datos obligatorios en un asiento (zona, asiento o tipo).");
+            // Validación del ID del evento
+            if (empty($evento) || !($evento instanceof MongoDB\BSON\ObjectId)) {
+                throw new InvalidArgumentException("El ID del evento es inválido. Debe ser un ObjectId válido.");
             }
     
-            $payload = [
-                "event" => $evento,
-                "client_id" => $id,
-                "zona" => $dato['zona'],
-                "fila" => $dato['fila'] ?? null,
-                "asiento" => $dato['asiento'],
-                "tipo_asiento" => $dato['tipo'],
-                "timestamp" => time() // Agrega un timestamp para evitar repetidos
-            ];
-    
-            try {
-                $jwt = JWT::encode($payload, self::$clave, 'HS256');
-                $tokens[] = $jwt;
-            } catch (Exception $e) {
-                throw new RuntimeException("Error al generar el token JWT: " . $e->getMessage());
+            // Validación del ID del cliente
+            if (empty($id) || !($id instanceof MongoDB\BSON\ObjectId)) {
+                throw new InvalidArgumentException("El ID del cliente es inválido. Debe ser un ObjectId válido.");
             }
-        }
     
-        return $tokens; // Devuelve un array con los tokens generados para cada boleto
+            // Validación de la lista de asientos
+            if (!is_array($datos_zona) || count($datos_zona) === 0) {
+                throw new InvalidArgumentException("Se requiere al menos un asiento para generar la clave del boleto.");
+            }
+    
+            $tokens = [];
+    
+            // Procesar cada asiento y generar la clave
+            foreach ($datos_zona as $dato) {
+                if (!isset($dato['zona'], $dato['tipo'])) {
+                    throw new InvalidArgumentException("Faltan datos obligatorios en un asiento (zona, asiento o tipo).");
+                }
+    
+                $payload = [
+                    "event" => (string) $evento,
+                    "client_id" => (string) $id,
+                    "zona" => $dato['zona'],
+                    "fila" => $dato['fila'] ?? null,
+                    "asiento" => $dato['asiento'] ?? null,
+                    "tipo_asiento" => $dato['tipo'],
+                    "timestamp" => time() // Agrega un timestamp para evitar repetidos
+                ];
+    
+                try {
+                    $jwt = JWT::encode($payload, self::$clave, 'HS256');
+                    $tokens[] = $jwt;
+                } catch (Exception $e) {
+                    throw new RuntimeException("Error al generar el token JWT: " . $e->getMessage());
+                }
+            }
+    
+            return ["status" => true, "message" => "Claves generadas correctamente", "data" => $tokens];
+    
+        } catch (InvalidArgumentException $e) {
+            return ["status" => false, "message" => "Error en la validación: " . $e->getMessage()];
+        } catch (RuntimeException $e) {
+            return ["status" => false, "message" => "Error en la generación del JWT: " . $e->getMessage()];
+        } catch (Exception $e) {
+            return ["status" => false, "message" => "Error inesperado: " . $e->getMessage()];
+        }
     }
+    
     public static function generarCodigoBarras($datos_boleto, $evento, $idc) {
-        self::init();
+        try {
+            self::init();
     
-        // Validación del evento
-        if (!is_string($evento) || strlen($evento) > 255) {
-            throw new InvalidArgumentException("El evento debe ser un string de máximo 255 caracteres.");
+            // Validación del evento
+            if (empty($evento) || !($evento instanceof MongoDB\BSON\ObjectId)) {
+                throw new InvalidArgumentException("El ID del evento es inválido. Debe ser un ObjectId válido.");
+            }
+    
+            // Validación de ID cliente
+            if (empty($idc) || !($idc instanceof MongoDB\BSON\ObjectId)) {
+                throw new InvalidArgumentException("El ID del cliente es inválido. Debe ser un ObjectId válido.");
+            }
+    
+            // Verificar que $datos_boleto es un array y no está vacío
+            if (!is_array($datos_boleto) || count($datos_boleto) === 0) {
+                throw new InvalidArgumentException("Se requiere al menos un boleto para generar el código de barras.");
+            }
+    
+            $codigosBarras = [];
+    
+            // Procesar cada boleto en el array
+            foreach ($datos_boleto as $dato) {
+                if (!isset($dato['zona'], $dato['tipo'])) {
+                    throw new InvalidArgumentException("Faltan datos obligatorios en un boleto (zona, asiento o tipo).");
+                }
+    
+                // Validaciones de tipo de datos
+                if (!is_string($dato['zona']) || strlen($dato['zona']) > 100) {
+                    throw new InvalidArgumentException("La zona debe ser un string de máximo 100 caracteres.");
+                }
+    
+                if (isset($dato['asiento']) && (!is_numeric($dato['asiento']) || $dato['asiento'] <= 0)) {
+                    throw new InvalidArgumentException("El número de asiento debe ser un número positivo.");
+                }
+    
+                if (isset($dato['fila']) && (!is_string($dato['fila']) || strlen($dato['fila']) > 10)) {
+                    throw new InvalidArgumentException("La fila debe ser un string de máximo 10 caracteres.");
+                }
+    
+                // Validación opcional de tipo de boleto
+                $tipo_boleto = $dato['tipo'] ?? '';
+                if (!is_string($tipo_boleto) || strlen($tipo_boleto) > 50) {
+                    throw new InvalidArgumentException("El tipo de boleto debe ser un string de máximo 50 caracteres.");
+                }
+    
+                // Construcción del payload para el token
+                $payload = [
+                    "evento" => (string) $evento,
+                    "cliente_id" => (string) $idc,
+                    "tipo_boleto" => $tipo_boleto,
+                    "zona" => $dato['zona'],
+                    "fila" => $dato['fila'] ?? null,
+                    "asiento" => $dato['asiento'] ?? null,
+                    "timestamp" => time() // Agrega un timestamp para evitar repetidos
+                ];
+    
+                // Generar token y código de barras único
+                $token = JWT::encode($payload, self::$clave, 'HS256');
+                $codigoBarras = substr(hash('sha256', $token), 0, 16); // Código único basado en hash
+    
+                $codigosBarras[] = $codigoBarras;
+            }
+    
+            return ["status" => true, "message" => "Códigos de barras generados correctamente.", "data" => $codigosBarras];
+    
+        } catch (InvalidArgumentException $e) {
+            return ["status" => false, "message" => "Error en los datos: " . $e->getMessage()];
+        } catch (Exception $e) {
+            return ["status" => false, "message" => "Error inesperado: " . $e->getMessage()];
         }
-    
-        // Validación de ID cliente
-        if (empty($idc) || !is_string($idc)) {
-            throw new InvalidArgumentException("El ID del cliente es inválido.");
-        }
-    
-        // Verificar que $datos_boleto es un array y no está vacío
-        if (!is_array($datos_boleto) || count($datos_boleto) === 0) {
-            throw new InvalidArgumentException("Se requiere al menos un boleto para generar el código de barras.");
-        }
-    
-        $codigosBarras = [];
-    
-        // Procesar cada boleto en el array
-        foreach ($datos_boleto as $dato) {
-            if (!isset($dato['zona'], $dato['asiento'], $dato['tipo'])) {
-                throw new InvalidArgumentException("Faltan datos obligatorios en un boleto (zona, asiento o tipo).");
-            }
-    
-            // Validaciones de tipo de datos
-            if (!is_string($dato['zona']) || strlen($dato['zona']) > 100) {
-                throw new InvalidArgumentException("La zona debe ser un string de máximo 100 caracteres.");
-            }
-            if (!is_numeric($dato['asiento']) || $dato['asiento'] <= 0) {
-                throw new InvalidArgumentException("El número de asiento debe ser un número positivo.");
-            }
-    
-            // Validación opcional de fila
-            if (isset($dato['fila']) && (!is_string($dato['fila']) || strlen($dato['fila']) > 10)) {
-                throw new InvalidArgumentException("La fila debe ser un string de máximo 10 caracteres.");
-            }
-    
-            // Validación opcional de tipo de boleto
-            $tipo_boleto = $dato['tipo'] ?? '';
-            if (!is_string($tipo_boleto) || strlen($tipo_boleto) > 50) {
-                throw new InvalidArgumentException("El tipo de boleto debe ser un string de máximo 50 caracteres.");
-            }
-    
-            // Construcción del payload para el token
-            $payload = [
-                "evento" => $evento,
-                "cliente_id" => $idc,
-                "tipo_boleto" => $tipo_boleto,
-                "zona" => $dato['zona'],
-                "fila" => $dato['fila'] ?? null,
-                "asiento" => $dato['asiento'],
-                "timestamp" => time() // Agrega un timestamp para evitar repetidos
-            ];
-            
-            // Generar token y código de barras único
-            $token = JWT::encode($payload, self::$clave, 'HS256');
-            $codigoBarras = substr(hash('sha256', $token), 0, 16); // Código único basado en hash
-    
-            $codigosBarras[] = $codigoBarras;
-        }
-    
-        return $codigosBarras; // Devuelve un array con los códigos de barras generados
     }
     
 }

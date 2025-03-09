@@ -24,7 +24,7 @@ switch ($method) {
             $reservado="Taquilla";
             $estatus = $boletoController->crearBoleto($da,$reservado);
             if($estatus){
-                echo json_encode(["status" =>$estatus]);
+                echo json_encode($estatus);
                 exit();
             }else{
                 echo json_encode(["status" =>false]);

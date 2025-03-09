@@ -24,61 +24,84 @@ class CompraController {
         return $this->boletoModel->obtenerPorId($id);
     }
     public function crearBoleto($data, $taquilla) {
-        $id = new MongoDB\BSON\ObjectId(); // ID único para la compra
-        $precio=$data['precio'];
-        $zona = $data['zona'];
-        $recintoId = $data['recinto_id'];
-        $cantidad = $data['cantidad'];
-        $funcion=$data['funcion'];
-        // Reservar asientos
-        $resultados = $this->asientoController->reserveSeats($zona, $recintoId, $cantidad,$funcion, $id);
-        $asientos = $resultados['asientos'] ?? [];
-        
-        if (empty($asientos)) {
-            throw new RuntimeException("No se pudieron reservar asientos.");
+        try {
+            $id = new MongoDB\BSON\ObjectId();
+            $evento = new MongoDB\BSON\ObjectId($data['evento_id']);
+            $precio = $data['precio'] ?? null;
+            $zona = $data['zona'] ?? null;
+            $recintoId = $data['recinto_id'] ?? null;
+            $cantidad = $data['cantidad'] ?? 0;
+            $funcion = $data['funcion'] ?? null;
+    
+            if (!$precio || !$zona || !$recintoId || !$cantidad || !$funcion) {
+                throw new InvalidArgumentException("Faltan datos requeridos para la creación del boleto.");
+            }
+    
+            // Reservar asientos
+            $resultados = $this->asientoController->reserveSeats($zona, $recintoId, $cantidad, $funcion, $id);
+            if (!$resultados['status']) {
+                throw new RuntimeException("No se pudieron reservar los asientos.");
+            }
+    
+            $asientos = $resultados['asientos'] ?? [];
+            
+            // Generar claves y códigos de barras
+            $token = $this->tokenController->generarClave($asientos, $evento, $id);
+            $codigoBarras = $this->tokenController->generarCodigoBarras($asientos, $evento, $id);
+            if(!$token['status']){
+                throw new RuntimeException("No se genero correctamente el token.");
+            }
+            if(!$codigoBarras['status']){
+                throw new RuntimeException("No se genero correctamente el token.");
+            }
+            $token=$token['data'];
+            $codigoBarras=$codigoBarras['data'];
+            // Crear transacción de pago
+            $informacion_trans = $this->pagoController->create($asientos, $id, $cantidad, $evento, $precio, $taquilla);
+            $transaccion = $informacion_trans['inserted_id'] ?? null;
+    
+            if (!$transaccion) {
+                throw new RuntimeException("No se pudo crear la transacción de pago.");
+            }
+    
+            // Crear boletos para cada asiento reservado
+            $boletos = [];
+            foreach ($asientos as $i => $asiento) {
+                   
+                $boletoData = [
+                    "usuario_id" => $id,
+                    "evento_id" => $evento,
+                    "transaccion_id" => $transaccion,
+                    "recinto" => [
+                        "recinto_id" => $asiento['recinto_id'] ?? null,
+                        "funcion_id" => $asiento['funcion'] ?? null,
+                        "fila" => $asiento['fila'] ?? null,  
+                        "zona" => $asiento['zona'] ?? null,
+                        "asiento" => (string) $asiento['asiento'],
+                        "tipo" => $asiento['tipo'] ?? null,    
+                    ],
+                    "metodo_pago" => $data['metodo'] ?? null,
+                    "clave_unica" => $token[$i] ?? null,
+                    "fecha_expiracion" => null, // Genera fecha en formato MongoDB
+                    "fecha_compra" => new MongoDB\BSON\UTCDateTime(),
+                    "codigo_barras" => $codigoBarras[$i] ?? null,
+                    "fecha_exp_cb" =>null
+                ];
+    
+                // Guardar el boleto en la base de datos
+                $this->boletoModel->insertarBoleto($boletoData);
+                $boletos[] = $boletoData;
+            }
+    
+            return ["status" => true, "message" => "Boletos creados exitosamente", "data" => $boletos];
+    
+        } catch (InvalidArgumentException $e) {
+            return ["status" => false, "message" => "Error en los datos: " . $e->getMessage()];
+        } catch (RuntimeException $e) {
+            return ["status" => false, "message" => "Error en el proceso de boletos: " . $e->getMessage()];
+        } catch (Exception $e) {
+            return ["status" => false, "message" => "Error inesperado: " . $e->getMessage()];
         }
-    
-        // Generar claves y códigos de barras
-        $token = $this->tokenController->generarClave($asientos, $data['evento_id'], $id);
-        $codigoBarras = $this->tokenController->generarCodigoBarras($asientos, $data['evento_id'], $id);
-    
-        // Crear transacción de pago
-        $informacion_trans = $this->pagoController->create($asientos, $id, $cantidad,$data['evento_id'],$precio,$taquilla);
-        $transaccion = $informacion_trans['inserted_id'] ?? null;
-    
-        if (!$transaccion) {
-            throw new RuntimeException("No se pudo crear la transacción de pago.");
-        }
-    
-        // Crear boletos para cada asiento reservado
-        $boletos = [];
-        foreach ($asientos as $i => $asiento) {
-            $boletoData = [
-                "usuario_id" => $id,
-                "evento_id" => new MongoDB\BSON\ObjectId($data['evento_id']),
-                "transaccion_id" =>new MongoDB\BSON\ObjectId($transaccion),
-                "recinto"=>[
-                    "recinto_id"=>new MongoDB\BSON\ObjectId($asiento['recinto_id'])??null,
-                    "funcion_id"=>new MongoDB\BSON\ObjectId($asiento['funcion'])??null,
-                    "fila" => $asiento['fila'] ?? null,  
-                    "zona"=>$asiento['zona']??null,
-                    'asiento' => (string) $asiento['numero'],  // Asegura que 'asiento' sea un string
-                    "tipo" => $asiento['tipo'] ?? null,    
-                ],
-                "metodo_pago" => $data['metodo'],
-                "clave_unica" => $token[$i] ?? null,
-                "fecha_expiracion" => null,
-                "fecha_compra" => date('Y-m-d H:i:s'),
-                "codigo_barras" => $codigoBarras[$i] ?? null,
-                "fecha_exp_cb" => null
-            ];
-    
-            // Guardar el boleto en la base de datos
-            $this->boletoModel->insertarBoleto($boletoData);
-            $boletos[] = $boletoData;
-        }
-    
-        return true;
     }
     
     

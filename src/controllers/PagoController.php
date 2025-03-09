@@ -39,24 +39,26 @@ class PagoController {
             throw new InvalidArgumentException("Cantidad y precio deben ser valores numéricos positivos.");
         }
 
-        if (!is_string($evento) || strlen($evento) > 255) {
-            throw new InvalidArgumentException("El nombre del evento no es válido.");
+        if (empty($evento) || !($evento instanceof MongoDB\BSON\ObjectId)) {
+            throw new InvalidArgumentException("El ID del cliente es inválido. Debe ser un ObjectId válido.");
         }
-
         $total = $this->generarTotal($cantidad_b, $precio);
         $filas = [];
         $numeros_asiento = [];
 
         foreach ($datas as $data) {
-            if (!isset($data['fila'], $data['asiento'])) {
-                throw new InvalidArgumentException("Faltan datos de fila o asiento en un boleto.");
+            if (isset($data['fila'], $data['asiento'])) {
+                $filaSanitizada = htmlspecialchars(trim($data['fila']), ENT_QUOTES, 'UTF-8');
+                $asientoSanitizado = htmlspecialchars(trim($data['asiento']), ENT_QUOTES, 'UTF-8');
+                $filas[] = $filaSanitizada;
+                $numeros_asiento[] = $asientoSanitizado;
             }
-            $filas[] = $data['fila'];
-            $numeros_asiento[] = $data['asiento'];
+           
         }
+        
 
-        $filasStr = !empty($filas) ? implode(", ", $filas) : "N/A";
-        $asientosStr = !empty($numeros_asiento) ? implode(", ", $numeros_asiento) : "N/A";
+        $filasStr = !empty($filas) ? implode(", ", $filas) : "De pie";
+        $asientosStr = !empty($numeros_asiento) ? implode(", ", $numeros_asiento) : "De pie";
 
         $descripcion = "Compra de {$cantidad_b} boletos para el evento {$evento} en la(s) fila(s) {$filasStr}, asiento(s) {$asientosStr}.";
 
@@ -78,7 +80,7 @@ class PagoController {
 
         return [
             'status' => 'create',
-            'inserted_id' => (string) $insertResult->getInsertedId()
+            'inserted_id' => $insertResult->getInsertedId()
         ];
     }
 

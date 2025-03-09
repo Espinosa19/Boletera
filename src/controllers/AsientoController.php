@@ -185,32 +185,47 @@ class AsientoController
      * Lógica para marcar los asientos como reservados con tiempo de expiración
      */
     private function reserveMultipleSeats($seatIdsToReserve, $userId) {
-        $reservasExitosas = 0;
-        $asientosModificados = [];
-       
-        foreach ($seatIdsToReserve as $seatId) {
-
-            $resultado = $this->asientoModel->buscarModificar($seatId,$userId);
-
-            if ($resultado) {
-                $reservasExitosas++;
-                $asientosModificados[] = [
-                    '_id' => !empty($resultado['_id']) ? (string) $resultado['_id'] : null,
-                    'zona' => !empty($resultado['zona']) ? $resultado['zona'] : null,
-                    'fila' => !empty($resultado['fila']) ? $resultado['fila'] : null,
-                    'asiento' => !empty($resultado['numero']) ? (string)$resultado['numero'] : null,
-                    'tipo' => !empty($resultado['tipo_asiento']['nombre']) ? $resultado['tipo_asiento']['nombre'] : null
-                ];
-                
-            }
-        }
+        try {
+            $reservasExitosas = 0;
+            $asientosModificados = [];
     
-        return [
-            "success" => $reservasExitosas === count($seatIdsToReserve),
-            "reservados" => $reservasExitosas,
-            "asientos" => $asientosModificados
-        ];
+            foreach ($seatIdsToReserve as $seatId) {
+                try {
+                    $resultado = $this->asientoModel->buscarModificar($seatId, $userId);
+    
+                    if ($resultado) {
+                        $reservasExitosas++;
+                        $asientosModificados[] = [
+                            '_id' => !empty($resultado['_id']) ? (string) $resultado['_id'] : null,
+                            'zona' => !empty($resultado['zona']) ? $resultado['zona'] : null,
+                            'fila' => !empty($resultado['fila']) ? $resultado['fila'] : null,
+                            'recinto_id' => $resultado['recinto_id'] ?? null,
+                            'funcion' => $resultado['funcion'] ?? null,
+                            'asiento' => !empty($resultado['numero']) ? (string) $resultado['numero'] : null,
+                            'tipo' => !empty($resultado['tipo_asiento']['nombre']) ? $resultado['tipo_asiento']['nombre'] : null
+                        ];
+                    }
+                } catch (Exception $e) {
+                    // Registrar error y continuar con el siguiente asiento
+                    error_log("Error al reservar asiento ID: $seatId - " . $e->getMessage());
+                }
+            }
+    
+            return [
+                "success" => $reservasExitosas === count($seatIdsToReserve),
+                "reservados" => $reservasExitosas,
+                "asientos" => $asientosModificados
+            ];
+    
+        } catch (Exception $e) {
+            // Capturar errores generales y devolver mensaje
+            return [
+                "success" => false,
+                "message" => "Error en la reserva de asientos: " . $e->getMessage()
+            ];
+        }
     }
+    
     
 
 }
