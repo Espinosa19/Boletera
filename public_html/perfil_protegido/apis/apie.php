@@ -78,9 +78,10 @@ switch ($request_method) {
             }
         }
         $imagen = isset($datos['imagen']) ? $datos['imagen'] : null;
+        $recomendado = $datos['recomendado'];
 
         // Llama al controlador para actualizar el evento
-        $respuesta = $eventos->actualizarEvento($id, $datos['nombre'], $datos['descripcion'], $imagen, $datos['recintos']);
+        $respuesta = $eventos->actualizarEvento($id, $datos['nombre'], $datos['categoria'],$datos['descripcion'], $imagen, $datos['recintos'],$recomendado);
         echo json_encode($respuesta);
         break;
 

@@ -121,7 +121,7 @@ class EventoController {
     /**
      * Actualizar un evento
      */
-    public function actualizarEvento($id, $nombre, $descripcion, $imagen, $recinto) {
+    public function actualizarEvento($id, $nombre, $cate,$descripcion, $imagen, $recinto,$reco) {
         if (empty($id) || empty($nombre) || empty($descripcion)) {
             echo json_encode(['error' => 'Faltan datos obligatorios']);
             http_response_code(400);
@@ -130,7 +130,9 @@ class EventoController {
 
         $datos = [
             'nombre' => $nombre,
+            'categoria'=>$cate,
             'descripcion' => $descripcion,
+            'recomendado'=>$reco,
             'imagen' => $imagen ?? '',
             'recintos' => $recinto ?? []
         ];

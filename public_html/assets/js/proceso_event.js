@@ -229,7 +229,8 @@ function agregarFuncion(button) {
     const descripcion = document.getElementById('descripcion').value;
     const imagen = document.getElementById('imagen').files[0]; // Imagen seleccionada
     const recintos = document.querySelectorAll('.recinto-container');
-
+    const re=document.getElementById("recomendado").checked;
+    console.log(re)
     const recintosArray = Array.from(recintos).map(recinto => {
         const selectRecinto = recinto.querySelector('select[name="recinto_id[]"]');
         const selectedOption = selectRecinto.options[selectRecinto.selectedIndex]; // Opción seleccionada
