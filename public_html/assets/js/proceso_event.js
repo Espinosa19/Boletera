@@ -36,14 +36,17 @@ function mostrarFormularioCrear() {
          `;
          eventoEnEdicion = null;
 
+
+
          // Añadir eventos a los botones de eliminar función
-     }function mostrarFormularioActualizar(id, nombre, descripcion, recintos,recomendado) {
+     }function mostrarFormularioActualizar(id, nombre,categoria,descripcion, recintos,recomendado) {
         document.getElementById("primer-button").style.display="none"
  document.getElementById('formulario').hidden = false;
  document.querySelector('.recinto-header').hidden = true;
  document.querySelector('#titulo-re').hidden = true;
  document.getElementById('titulo-formulario').innerText = 'Modificar Evento';
  document.getElementById('nombre').value = nombre;
+ document.getElementById('categoria').value=categoria;
  document.getElementById('descripcion').value = descripcion;
  document.getElementById("recomendado").checked = recomendado ;
  const funcionesContainer = document.querySelector('.funciones-container');
@@ -200,8 +203,7 @@ async function editarEvento(id) {
  if (!response.ok) throw new Error('Error al cargar el evento');
     const evento = await response.json();
     // Mostrar el objeto recibido
-    console.log(evento);
- mostrarFormularioActualizar(evento._id, evento.nombre, evento.descripcion, evento.recintos,evento.recomendado|| false);
+ mostrarFormularioActualizar(evento._id, evento.nombre,evento.categoria, evento.descripcion, evento.recintos,evento.recomendado|| false);
 }
 function agregarFuncion(button) {
  const funcionesContainer = button.previousElementSibling;
@@ -220,86 +222,95 @@ function agregarFuncion(button) {
 
 }async function guardarEvento(event) {
     event.preventDefault();
-    
+
     // Obtener los valores de los campos del formulario
     const nombre = document.getElementById('nombre').value;
+    const categoria = document.getElementById('categoria').value;
     const descripcion = document.getElementById('descripcion').value;
-    const imagen = document.getElementById('imagen').files[0];  // Imagen seleccionada
+    const imagen = document.getElementById('imagen').files[0]; // Imagen seleccionada
     const recintos = document.querySelectorAll('.recinto-container');
 
     const recintosArray = Array.from(recintos).map(recinto => {
         const selectRecinto = recinto.querySelector('select[name="recinto_id[]"]');
-        const selectedOption = selectRecinto.options[selectRecinto.selectedIndex]; // Obtiene la opción seleccionada
+        const selectedOption = selectRecinto.options[selectRecinto.selectedIndex]; // Opción seleccionada
         const recintoName = selectedOption.getAttribute("data-name"); // Captura el data-name
-    
+
         const funciones = recinto.querySelectorAll('.funcion');
         const funcionesArray = Array.from(funciones).map(funcion => ({
             fecha_inicio: funcion.querySelector('input[name="fecha_inicio[]"]').value,
             fecha_fin: funcion.querySelector('input[name="fecha_fin[]"]').value
         }));
 
-        // Verificación de fechas de inicio y fin
-        for (let funcion of funcionesArray) {
-            const fechaInicio = new Date(funcion.fecha_inicio);
-            const fechaFin = new Date(funcion.fecha_fin);
-
-            if (fechaFin < fechaInicio) {
-                alert(`La fecha de fin de la función en el recinto "${recintoName}" debe ser posterior a la fecha de inicio.`);
-                throw new Error('Fecha de fin inválida');
-            }
-        }
-    
         return {
-            id: selectRecinto.value, 
-            nombre: recintoName,  // Agregamos el nombre del recinto
+            id: selectRecinto.value,
+            nombre: recintoName,
             funciones: funcionesArray
         };
     });
-    
-    console.log(recintosArray); // Para verificar la estructura en la consola
-    
-    // Si no se encuentran recintos, muestra un error
-    if (recintosArray.length === 0) {
-        console.error('No se encontraron recintos.');
-        alert('Por favor, agrega al menos un recinto con sus funciones.');
-        return; 
+
+    // Validar los datos antes de enviarlos
+    const validacion = validarDatosEvento(nombre, categoria, descripcion, imagen, recintosArray);
+    if (validacion !== true) {
+        alert(validacion);
+        return;
     }
 
     // Determina si estamos creando o actualizando un evento (POST o PUT)
     const metodo = eventoEnEdicion ? 'PUT' : 'POST';
 
-    // Enviar la solicitud al servidor
     const url = './apis/apie.php';
-    
+
     try {
-        // Enviar los datos directamente dentro de la solicitud
         const response = await fetch(url, {
             method: metodo,
             headers: {
                 "Content-Type": "application/json", // Enviar como JSON
             },
             body: JSON.stringify({
-                nombre: nombre,
-                descripcion: descripcion,
-                imagen: imagen ? imagen.name : null,  // Solo enviamos el nombre de la imagen
+                nombre,
+                descripcion,
+                imagen: imagen ? imagen.name : null, // Solo enviamos el nombre de la imagen
                 recintos: recintosArray,
-                recomendado: document.getElementById("recomendado").checked,  
-                _id: eventoEnEdicion || null  // Si estamos editando un evento, añadimos el ID
+                categoria,
+                recomendado: document.getElementById("recomendado").checked,
+                _id: eventoEnEdicion || null // Si estamos editando un evento, añadimos el ID
             })
         });
 
         if (!response.ok) throw new Error('Error al guardar evento');
-        
+
         const result = await response.json(); // Asume que el servidor responde con JSON
-        console.log(result);
-        alert(result.success || result.error); // Mostrar mensaje de éxito o error
+        alert(result.success || result.error);
         cargarEventos();
         cancelarFormulario();
-
     } catch (error) {
         console.error('Error al guardar evento:', error);
         alert('Error al guardar el evento');
     }
+}
+
+// 🔹 Método de Validación
+function validarDatosEvento(nombre, categoria, descripcion, imagen, recintos) {
+    if (!nombre.trim()) return 'El nombre del evento es obligatorio.';
+    if (!categoria) return 'Debes seleccionar una categoría.';
+    if (!descripcion.trim()) return 'La descripción no puede estar vacía.';
+    if (!imagen) return 'Debes seleccionar una imagen para el evento.';
+    if (recintos.length === 0) return 'Debes agregar al menos un recinto con funciones.';
+
+    for (let recinto of recintos) {
+        for (let funcion of recinto.funciones) {
+            const fechaInicio = new Date(funcion.fecha_inicio);
+            const fechaFin = new Date(funcion.fecha_fin);
+            if (!funcion.fecha_inicio || !funcion.fecha_fin) {
+                return `Las fechas de inicio y fin son obligatorias en el recinto "${recinto.nombre}".`;
+            }
+            if (fechaFin < fechaInicio) {
+                return `La fecha de fin en el recinto "${recinto.nombre}" debe ser posterior a la de inicio.`;
+            }
+        }
+    }
+
+    return true; // Datos válidos
 }
 
 async function eliminarEvento(id) {

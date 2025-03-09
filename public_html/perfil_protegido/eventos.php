@@ -27,6 +27,41 @@ require dirname(__DIR__,2) . "/src/routes.php";
             <form method="POST" enctype="multipart/form-data" onsubmit="guardarEvento(event)"> 
                 <label>Nombre:</label>
                 <input type="text" id="nombre" name="nombre" required>
+                <select name="categoria" id="categoria">
+                    <optgroup label="🎤 Conciertos y Música">
+                        <option value="pop">Pop</option>
+                        <option value="rock">Rock</option>
+                        <option value="electronica">Electrónica</option>
+                        <option value="regueton">Reguetón</option>
+                        <option value="musica_clasica">Música Clásica</option>
+                        <option value="jazz_blues">Jazz & Blues</option>
+                        <option value="regional_mexicano">Regional Mexicano</option>
+                        <option value="indie">Indie</option>
+                    </optgroup>
+                    <optgroup label="🎭 Teatro y Cultura">
+                        <option value="obras_teatro">Obras de Teatro</option>
+                        <option value="ballet">Ballet</option>
+                        <option value="opera">Ópera</option>
+                        <option value="standup_comedy">Stand-Up Comedy</option>
+                        <option value="exposiciones_arte">Exposiciones de Arte</option>
+                        <option value="festivales_culturales">Festivales Culturales</option>
+                    </optgroup>
+                    <optgroup label="⚽ Deportes">
+                        <option value="futbol">Fútbol</option>
+                        <option value="baloncesto">Baloncesto</option>
+                        <option value="beisbol">Béisbol</option>
+                        <option value="lucha_libre">Lucha Libre</option>
+                        <option value="automovilismo">Automovilismo</option>
+                        <option value="boxeo">Boxeo</option>
+                        <option value="artes_marciales">Artes Marciales</option>
+                    </optgroup>
+                    <optgroup label="🎡 Ferias y Festivales">
+                        <option value="festivales_gastronomicos">Festivales Gastronómicos</option>
+                        <option value="festivales_musica">Festivales de Música</option>
+                        <option value="ferias_tecnologicas">Ferias Tecnológicas</option>
+                        <option value="ferias_libro">Ferias del Libro</option>
+                    </optgroup>
+                </select>
 
                 <label>Descripción:</label>
                 <textarea id="descripcion" name="descripcion" required></textarea>
@@ -126,6 +161,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
 </table>
 
     </div>
-<script src="../assets/js/proceso_evento.js"></script>
+<script src="../assets/js/proceso_event.js"></script>
 </body>
 </html>

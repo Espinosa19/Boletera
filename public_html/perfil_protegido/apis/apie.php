@@ -47,7 +47,7 @@ switch ($request_method) {
             }
 
             // Llama al controlador para crear el evento con los datos actualizados
-            $respuesta = $eventos->crear($datos['nombre'], $datos['descripcion'], $imagen, $datos['recintos'],$recomendado);
+            $respuesta = $eventos->crear($datos['nombre'], $datos['categoria'],$datos['descripcion'], $imagen, $datos['recintos'],$recomendado);
         }
         echo json_encode($respuesta);
         break;

@@ -97,7 +97,7 @@ class EventoController {
     /**
      * Crear un nuevo evento
      */
-    public function crear($nombre, $descripcion, $imagen, $recinto,$reco) {
+    public function crear($nombre,$cate, $descripcion, $imagen, $recinto,$reco) {
         if (empty($nombre) || empty($descripcion)) {
             echo json_encode(['error' => 'Faltan datos obligatorios']);
             return;
@@ -105,6 +105,7 @@ class EventoController {
 
         $datos = [
             'nombre' => $nombre,
+            'categoria'=>$cate,
             'descripcion' => $descripcion,
             'imagen' => $imagen ?? '',
             'recomendado'=>$reco,
