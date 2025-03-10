@@ -37,62 +37,107 @@ class EventoController {
         return $this->eventoModel->obtenerEventos();
         
     }
+
     /**
      * Obtener eventos por ID de recinto
      */
-    public function obtenerEventosPorId($id) {
-        // Validar que el ID sea un ID válido de MongoDB
-        if (!preg_match('/^[a-f0-9]{24}$/', $id)) {
-            return $this->responseError('ID no válido.', 400);
+    public function obtenerEventosPorId($id_evento, $id) {
+        // Validar que el ID sea un string de MongoDB
+        if ($id_evento instanceof MongoDB\BSON\ObjectId) {
+            $id_evento = (string) $id_evento;
+        }
+        if ($id instanceof MongoDB\BSON\ObjectId) {
+            $id = (string) $id;
         }
     
         try {
             // Buscar eventos por ID de recinto
-            $eventos = $this->eventoModel->obtenerEventosPorId($id);
-            
-            // Convertir el cursor a array
-            $eventos = iterator_to_array($eventos); // Utilizar iterator_to_array() para convertir el cursor en un array
+            $evento = $this->eventoModel->obtenerEventoPorId($id_evento);
     
-            if (empty($eventos)) {
-                return $this->responseError('No se encontraron eventos con el ID proporcionado.', 404);
+            // Si el evento no se encuentra, retornamos error
+            if (!$evento) {
+                return $this->responseError('No se encontró el evento con el ID proporcionado.', 404);
             }
     
-            $eventosC = []; // Crear un array para las funciones
+            // Convertir ObjectId en los recintos a string
+            foreach ($evento['recintos'] as &$recinto) {
+                if ($recinto['id'] instanceof MongoDB\BSON\ObjectId) {
+                    $recinto['id'] = (string) $recinto['id'];
+                }
     
-            foreach ($eventos as $evento) {
-                foreach ($evento['recintos'] as $recinto) {
-                    if ((string)$recinto['id'] === $id) { // Usamos $id aquí
-                        foreach ($recinto['funciones'] as $funcion) {
-                            // Verificar si los campos fecha_inicio y fecha_fin son instancias de UTCDateTime
-                            $fecha_inicio = $funcion['fecha_inicio'];
-                            $fecha_fin = $funcion['fecha_fin'];
-                            $id=$funcion['id'];
-                            // Convertir a DateTime solo si es un objeto UTCDateTime
-                            if ($fecha_inicio instanceof MongoDB\BSON\UTCDateTime) {
-                                $fecha_inicio = $fecha_inicio->toDateTime()->format('Y-m-d H:i');
-                            }
-    
-                            if ($fecha_fin instanceof MongoDB\BSON\UTCDateTime) {
-                                $fecha_fin = $fecha_fin->toDateTime()->format('Y-m-d H:i');
-                            }
-    
-                            // Agregar la función al array de resultados
-                            $eventosC[] = [
-                                "_id"=>$id,
-                                'nombre' => $evento['nombre'],
-                                'fecha_inicio' => $fecha_inicio,
-                                'fecha_fin' => $fecha_fin,
-                            ];
-                        }
+                // Convertir ObjectId en funciones a string
+                foreach ($recinto['funciones'] as &$funcion) {
+                    if (isset($funcion['id']) && $funcion['id'] instanceof MongoDB\BSON\ObjectId) {
+                        $funcion['id'] = (string) $funcion['id'];
                     }
                 }
             }
-            return $eventosC;
     
+            $respuesta = [];
+            if (!$id) {
+
+                // Buscar funciones del recinto específico
+                foreach ($evento['recintos'] as $recinto) {
+                    $recinto_id=$recinto['id'];
+                    foreach ($recinto['funciones'] as $funcion) {
+                        $fecha_inicio = isset($funcion['fecha_inicio']) ? $funcion['fecha_inicio'] : null;
+                        $fecha_fin = isset($funcion['fecha_fin']) ? $funcion['fecha_fin'] : null;
+
+                        // Convertir UTCDateTime a formato legible
+                        if ($fecha_inicio instanceof MongoDB\BSON\UTCDateTime) {
+                            $fecha_inicio = $fecha_inicio->toDateTime()->format('Y-m-d H:i');
+                        }
+
+                        if ($fecha_fin instanceof MongoDB\BSON\UTCDateTime) {
+                            $fecha_fin = $fecha_fin->toDateTime()->format('Y-m-d H:i');
+                        }
+
+                        // Agregar la función a la respuesta
+                        $respuesta[] = [
+                            "_id" => $funcion['id'],
+                            'recinto'=>$recinto_id,
+                            'nombre' => $evento['nombre'],
+                            'fecha_inicio' => $fecha_inicio,
+                            'fecha_fin' => $fecha_fin,
+                        ];
+                        
+                    }
+                
+            }
+        }
+            else{
+                foreach ($evento['recintos'] as $recinto) {
+                    if ($recinto['id'] === $id) {
+                        foreach ($recinto['funciones'] as $funcion) {
+                            $fecha_inicio = isset($funcion['fecha_inicio']) ? $funcion['fecha_inicio'] : null;
+                            $fecha_fin = isset($funcion['fecha_fin']) ? $funcion['fecha_fin'] : null;
+
+                            // Convertir UTCDateTime a formato legible
+                            if ($fecha_inicio instanceof MongoDB\BSON\UTCDateTime) {
+                                $fecha_inicio = $fecha_inicio->toDateTime()->format('Y-m-d H:i');
+                            }
+
+                            if ($fecha_fin instanceof MongoDB\BSON\UTCDateTime) {
+                                $fecha_fin = $fecha_fin->toDateTime()->format('Y-m-d H:i');
+                            }
+
+                            // Agregar la función a la respuesta
+                            $respuesta[] = [
+                                "_id" => $funcion['id'],
+                                'nombre' => $evento['nombre'],
+                            ];
+                        } 
+                    }
+                }
+            }
+    
+            return $respuesta;
         } catch (MongoDB\Exception\Exception $e) {
             return $this->responseError('Error en la conexión con la base de datos o consulta', 500, $e->getMessage());
         }
     }
+    
+    
     
     /**
      * Crear un nuevo evento

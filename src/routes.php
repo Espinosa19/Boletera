@@ -52,7 +52,7 @@ if(!empty($_SESSION['datos-token'])){
         $permisos = $tokenController->validarToken($_SESSION['datos-token']);
         verificacionAcceso($permisos);
         $asientos = $asientoController->obtenerTodos();
-        $recintos = $recintoController->obtenerRecintos();
+        $eventos=$eventoController->listar();
         $tipos = $tipoController->obtenerTiposAsientos();
     } 
     else if ($uri == 'perfil_protegido/asientos-tabla.php') {

@@ -54,16 +54,24 @@ switch ($method) {
                     }
                 
                     if (!empty($data['datosSin'])) { // Verifica si 'datosSin' no está vacío
-                        $resultado = $controller->insertarAsientosPorTipo($data['datosSin'],$data['tipoAsientoId'],$data['recintoId'],$data['funcion_even']);
+                        $resultado = $controller->insertarAsientosPorTipo($data['datosSin'],$data['tipoAsientoId'],$data['recintoId'],$data['funcion_even'],$data['evento']);
+                        if(!$resultado['status']){
+                            echo json_encode(['status'=>false]);
+                            exit();
+                        }
                     } 
                     if(!empty($data['datos'])) {
                         $resultado = $controller->insertarAsiento($data);
+                        if(!$resultado['status']){
+                            echo json_encode(['status'=>false]);
+                            exit();
+                        }
                     }
-                
-                    echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+                    
                 }
                 
             }
+            echo json_encode(['status'=>true]);
             exit();
             break;
         

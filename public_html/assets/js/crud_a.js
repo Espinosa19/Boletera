@@ -23,10 +23,41 @@ document.addEventListener("DOMContentLoaded", () => {
    }
 
 )
+document.getElementById("evento").addEventListener("change", function () { 
+    const evento = this.value; // Usamos `this.value` dentro de una función normal
+    if (evento) {
+        fetch(`./apis/apiof.php?evento_id=${evento}`) // Usamos `evento` en lugar de `recintoId`
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+
+            const recinto2 = document.getElementById("recinto2");
+            recinto2.innerHTML = ""; // Limpiar opciones previas
+
+            // Agregar una opción por defecto
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.innerText = "Seleccione un recinto";
+            recinto2.appendChild(defaultOption);
+
+            // Agregar las opciones de los recintos
+            data.forEach(reci => {
+                const option = document.createElement("option");
+                option.value = reci.recinto; 
+                option.setAttribute("data-funcion",reci._id);
+                option.innerText = `${reci.nombre}-${reci.fecha_inicio} a ${reci.fecha_fin}`;
+                recinto2.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Error en la petición:", error));
+    }
+});
+
    document.getElementById("recinto2").addEventListener("change", function() {
     const recintoId = this.value;
+    const evento=document.getElementById("evento").value;
     if (recintoId) {
-        fetch(`./apis/apiof.php?recinto_id=${recintoId}`)
+        fetch(`./apis/apiof.php?recinto_id=${recintoId}&evento_id=${evento}`)
         .then(response => response.json())
         .then(data => {
             console.log(data)
@@ -43,20 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             zonas.appendChild(selec); // Agregar el select de zonas al contenedor
 
-            const funcionSelect = document.getElementById("funcion2");
-            funcionSelect.innerHTML = ""; // Limpiar el select de funciones
-
-            const defaultOption = document.createElement("option");
-            defaultOption.value = "";
-            defaultOption.textContent = "Seleccione una función";
-            funcionSelect.appendChild(defaultOption);
-
-            data.funciones.forEach(funcion => {
-                const option = document.createElement("option");
-                option.value = funcion._id; // El ID de la funcin
-                option.textContent = `${funcion.nombre} - ${funcion.fecha_inicio} a ${funcion.fecha_fin}`;
-                funcionSelect.appendChild(option);
-            });
         })
         .catch(error => {
             console.error("Error al obtener las funciones:", error);
@@ -457,8 +474,10 @@ function obtenerDatosAsientos() {
     // Validar campos de tipoAsientoId, recintoId y funcion
     const tipoAsientoId = document.getElementById("tipoAsiento_s")?.value.trim();
     const recintoId = document.getElementById("recinto2")?.value.trim();
-    const funcion = document.querySelector("#funcion2")?.value.trim();
-
+    const select = document.getElementById("recinto2"); // Reemplaza "miSelect" con el ID real
+    const opcionSeleccionada = select.options[select.selectedIndex];
+    const funcion = opcionSeleccionada.getAttribute("data-funcion");
+    const e=document.getElementById("evento").value.trim();
     if (!tipoAsientoId || !recintoId || !funcion) {
         alert("Por favor, completa todos los campos obligatorios (tipo de asiento, recinto y función).");
         return false;
@@ -468,6 +487,7 @@ function obtenerDatosAsientos() {
     datos.push({
         datos: dataAsientos,
         datosSin: dataSinAsientos.length > 0 ? dataSinAsientos : null,
+        evento:e,
         tipoAsientoId: tipoAsientoId,
         recintoId: recintoId,
         funcion_even: funcion

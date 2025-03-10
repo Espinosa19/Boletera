@@ -18,6 +18,7 @@ class Evento {
         return $this->collection->find(['recintos.id' => (string) $id]);
 
     } 
+
     public function obtenerEventoPorId($id) {
         return $this->collection->findOne(['_id' => new ObjectId($id)]);
     }

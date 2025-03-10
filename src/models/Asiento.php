@@ -25,7 +25,7 @@ class Asiento
     public function obtenerRecintoFuncion($recinto,$funcion){
         return $this->collection->find(['recinto_id'=>new ObjectId($recinto),'funcion'=>new ObjectId($funcion)])->toArray();
     }
-    public function insertarAsiento($recintoId, $tipoAsiento, $funcion_even, $zona,$fila, $asiento)
+    public function insertarAsiento($recintoId, $evento,$tipoAsiento, $funcion_even, $zona,$fila, $asiento)
     {
         try {
             if (!$tipoAsiento) {
@@ -34,6 +34,7 @@ class Asiento
 
             $nuevoAsiento = [
                 'recinto_id' => $recintoId,
+                'evento_id'=>$evento,
                 'tipo_asiento' => [
                     '_id' => $tipoAsiento['_id'],
                     'nombre' => $tipoAsiento['nombre'],
@@ -135,13 +136,14 @@ class Asiento
             throw new Exception('Error al eliminar el asiento: ' . $e->getMessage());
         }
     }
-    public function insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento,$cantidad)
+    public function insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento,$cantidad,$evento)
     {
         try {
            
             for ($i = 0; $i < (int) $cantidad; $i++) {
                 $nuevoAsiento = [
                     'recinto_id' => $recintoId,
+                    'evento_id'=>$evento,
                     'tipo_asiento' => [
                         '_id' => $tipoAsientoId,
                         'nombre' => $tipoAsiento['nombre'],

@@ -160,27 +160,27 @@ require dirname(__DIR__,2) . "/src/routes.php";
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div>
-                <label for="recinto">Recinto:</label>
-                <select class="recinto_id" id="recinto2" required>
-                    <option value="">Seleccione un recinto</option>
-                    <?php foreach ($recintos as $recinto): ?>
-                        <option value="<?php echo htmlspecialchars($recinto['_id']); ?>">
-                            <?php echo htmlspecialchars($recinto['nombre']); ?> - Ubicacin: <?php echo htmlspecialchars($recinto['ciudad']); ?>
+                <label for="evento">Evento:</label>
+                <select class="evento" id="evento" required>
+                    <option value="">Seleccione un evento</option>
+                    <?php foreach ($eventos as $evento): ?>
+                        <option value="<?php echo htmlspecialchars($evento['_id']); ?>">
+                            <?php echo htmlspecialchars($evento['nombre']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
+           
         </div>
 
         <div>
-            <label for="funcion">Función:</label>
-            <select class="funcion_id" id="funcion2" required>
-                <option value="">Seleccione una función</option>
-                <!-- Aquí se agregarán las funciones dinámicamente -->
-            </select>
-        </div>
+                <label for="recinto">Recinto:</label>
+                <select class="recinto_id" id="recinto2" required>
+                    <option value="">Seleccione un recinto</option>
+                    
+                </select>
+            </div>
     <div id="contenedor-padre-zonas">
 
         <div class="contenedor-zonas">
@@ -201,7 +201,7 @@ require dirname(__DIR__,2) . "/src/routes.php";
         <button id="closeModalBtn">Cerrar</button>
     </div>
 </div>
-<script src="../assets/js/crud_asi.js"></script>
+<script src="../assets/js/crud_a.js"></script>
 
 </body>
 </html>

@@ -21,19 +21,16 @@ class obtenerFuncionController
         $this->eventoController = new EventoController();
 
     }
-
-    public function getFuncionesYZonas($recintoId)
-{
-    // Validar que el ID sea un ID válido de MongoDB
-    if (!preg_match('/^[a-f0-9]{24}$/', $recintoId)) {
-        return $this->responseError('recinto_id no es un ID válido.', 400);
+    public function getRecintos($evento){
+        return $this->eventoController->obtenerEventosPorId($evento);
     }
-
+    public function getFuncionesYZonas($recintoId,$evento)
+{
     try {
         // Buscar el recinto
         $recintosCursor = $this->recintoModel->obtenerRecintoPorId($recintoId);
         // Buscar los eventos asociados al recinto
-        $funcion = $this->eventoController->obtenerEventosPorId($recintoId);
+        $funcion = $this->eventoController->obtenerEventosPorId($evento,$recintoId);
 
         // Convertir los cursores a arrays si es necesario
         if ($funcion instanceof MongoDB\Driver\Cursor) {
@@ -53,7 +50,7 @@ class obtenerFuncionController
             
         }
 
-        return ['funciones' => $funcion, 'zonas' => $zonas];
+        return ['zonas' => $zonas];
 
     } catch (MongoDB\Exception\Exception $e) {
         return $this->responseError('Error en la conexión con la base de datos o consulta', 500, $e->getMessage());

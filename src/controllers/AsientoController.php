@@ -80,6 +80,7 @@ class AsientoController
     
         // Convertir IDs a ObjectId
         $recintoId = new ObjectId($asientos['recintoId']);
+        $evento=new ObjectId($asiento['evento']);
         $tipoAsientoId = new ObjectId($asientos['tipoAsientoId']);
         $funcion_even = new ObjectId($asientos['funcion_even']);
         $tipoAsiento = $this->tipoAsientoModel->obtenerPorId($tipoAsientoId);
@@ -103,6 +104,7 @@ class AsientoController
                     } else {
                         $this->asientoModel->insertarAsiento(
                             $recintoId,
+                            $evento,
                             $tipoAsiento,
                             $funcion_even,
                             $asiento['zona'],
@@ -115,7 +117,7 @@ class AsientoController
         }
     
         // Después de procesar todos los asientos, retornar el estado
-        return ['status' => 'create'];
+        return ['status' => true];
     }
     
     
@@ -130,18 +132,19 @@ class AsientoController
         }
     }
 
-    public function insertarAsientosPorTipo($datas, $tipoAsientoId,$recinto_id,$funcion)
+    public function insertarAsientosPorTipo($datas, $tipoAsientoId,$recinto_id,$funcion,$evento)
     {
         $recintoId = new ObjectId($recinto_id);
         $funcion_event = new ObjectId($funcion);
+        $evento=new ObjectId($evento);
         $tipoAsientoId = new ObjectId($tipoAsientoId);
         $tipoAsiento = $this->tipoAsientoModel->obtenerPorId($tipoAsientoId);
         foreach($datas as $data){
             $zona=$data['nombre_zona'];
             $cantidad=$data['cantidad'];
-            $this->asientoModel->insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento,$cantidad);
+            $this->asientoModel->insertarAsientosPorTipo($recintoId, $funcion_event, $zona, $tipoAsientoId, $tipoAsiento,$cantidad,$evento);
         }
-        return ['status' => 'create'];
+        return ['status' => true];
 
     }
     public function eliminarAsiento($id)
