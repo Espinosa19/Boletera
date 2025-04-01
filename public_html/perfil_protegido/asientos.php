@@ -183,25 +183,15 @@ require dirname(__DIR__,2) . "/src/routes.php";
             </div>
     <div id="contenedor-padre-zonas">
 
-        <div class="contenedor-zonas">
-            <label for="nombreZona">Nombre de la Zona:</label>
-            <div id="zonas"></div>
-            <label for="filasZona">Selecciona letras de filas (A-Z):</label><br>
-            <div id="checkboxContainer"></div>
-            <h2>Selecciona los asientos:</h2>
-            <div id="inputsContainer"></div>
-            <button id="eliminar">Eliminar Zona</button>
-        </div>
+       
     </div>
     
 <!-- Contenedor para los inputs dinámicos -->
         <button id="obtenerDatosBtn">Agregar</button>
-        <button id="agregarOtraZona">Agregar zona con asiento</button>
-        <button id="agregarZonaSinAsiento">Agregar zona sin asientos</button>
         <button id="closeModalBtn">Cerrar</button>
     </div>
 </div>
-<script src="../assets/js/crud_a.js"></script>
+<script src="../assets/js/crudasi.js"></script>
 
 </body>
 </html>

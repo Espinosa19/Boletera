@@ -11,14 +11,14 @@ class Asiento
         $this->collection = $this->db->selectCollection("asientos");
     }
 
-    public function obtenerTodos()
+    public function obtenerTodos($limite, $salto)
     {
-        try {
-            return $this->collection->find()->toArray();
-        } catch (Exception $e) {
-            throw new Exception('Error al obtener los asientos: ' . $e->getMessage());
-        }
+        return $this->collection->find([], [
+            'limit' => $limite,
+            'skip' => $salto
+        ])->toArray();
     }
+    
     public function obtenerPorId($id){
         return $this->collection->findOne(['_id'=>new ObjectId($id)]);
     }

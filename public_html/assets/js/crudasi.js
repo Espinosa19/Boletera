@@ -8,21 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href="asientos-tabla.php"
     };
 
-    document.getElementById("agregarOtraZona").addEventListener("click", () => {
-    agregarOtraZona();
-
-    // Espera un poco antes de verificar si los checkboxes clonados existen
-   
-});
     // Cerrar el modal al hacer clic en el botón
     document.getElementById('closeModalBtn').addEventListener('click', function() {
         document.getElementById('addSeatModal').style.display = 'none';
     });
-   document.getElementById('agregarZonaSinAsiento').addEventListener("click",()=>{
-        agregarZonaSinAsiento();
-   }
 
-)
+
 document.getElementById("evento").addEventListener("change", function () { 
     const evento = this.value; // Usamos `this.value` dentro de una función normal
     if (evento) {
@@ -52,94 +43,133 @@ document.getElementById("evento").addEventListener("change", function () {
         .catch(error => console.error("Error en la petición:", error));
     }
 });
-
-   document.getElementById("recinto2").addEventListener("change", function() {
+document.getElementById("recinto2").addEventListener("change", function () {
     const recintoId = this.value;
-    const evento=document.getElementById("evento").value;
+    const evento = document.getElementById("evento").value;
+
     if (recintoId) {
         fetch(`./apis/apiof.php?recinto_id=${recintoId}&evento_id=${evento}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            const zonas = document.getElementById('zonas');
-            zonas.innerHTML = ''; 
-        
-            const selec = document.createElement('select');
-            selec.classList.add('zona_nombre');
-            data.zonas.forEach(zona => {
-                const option = document.createElement("option");
-                option.value = zona.nombre_zona; // Usar una propiedad específica como value
-                option.textContent = zona.nombre_zona; // Usar la misma propiedad para el texto
-                selec.appendChild(option);
-            });
-            zonas.appendChild(selec); // Agregar el select de zonas al contenedor
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
 
-        })
-        .catch(error => {
-            console.error("Error al obtener las funciones:", error);
-        });
+                const contenedor_padre_zonas = document.getElementById("contenedor-padre-zonas");
+                contenedor_padre_zonas.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevas zonas
+
+                data.zonas.forEach(zona => {
+                    let capacidad = zona.capacidad || 0; // Usar 0 si no hay capacidad definida
+                    // Crear un nuevo contenedor para cada zona
+                    const contenedor_zonas = document.createElement("div");
+                    contenedor_zonas.classList.add("contenedor-zonas"); // Usar una clase en lugar de un ID para evitar duplicados
+                    contenedor_zonas.setAttribute("data-capacidad", capacidad); // Agregar capacidad como atributo
+
+                    const nombreZonaElement = document.createElement("label");
+                    nombreZonaElement.textContent = "Nombre de la Zona:";
+                    contenedor_zonas.appendChild(nombreZonaElement);
+
+                    const zonas = document.createElement("div");
+                    zonas.classList.add("zonas"); // Usar una clase en lugar de un ID para evitar duplicados
+
+                    const select = document.createElement("select");
+                    select.classList.add("zona_nombre");
+                    const option = document.createElement("option");
+                    option.value = zona.nombre_zona;
+                    option.textContent = zona.nombre_zona;
+                    select.appendChild(option);
+                    contenedor_zonas.appendChild(select);
+
+                    // Agregar contenido según el tipo de zona
+                    if (zona.tipo === "Asiento") {
+                        contenedor_zonas.appendChild(crearZonaConAsientos());
+                        
+                        const input = document.createElement("div");
+                        input.id="inputsContainer";
+                        contenedor_zonas.appendChild(input);
+                        contenedor_zonas.appendChild(document.createElement("hr"));
+                    } else if (zona.tipo === "sin_asiento") {
+                        contenedor_zonas.appendChild(crearZonaSinAsientos());
+                    }
+
+                    // Agregar el contenedor de la zona al contenedor padre
+                    contenedor_padre_zonas.appendChild(contenedor_zonas);
+                });
+            })
+            .catch(error => {
+                console.error("Error al obtener las funciones:", error);
+            });
     }
 });
-const inputsContainer = document.getElementById('inputsContainer'); // Contenedor para los inputs dinámicos
+// Función para crear una zona con asientos
+function crearZonaConAsientos() {
 
-if (!checkboxContainer || !inputsContainer) {
-    console.error('Contenedor no encontrado');
-    return;
+    const checkboxContainer = document.createElement('div');
+    checkboxContainer.id = "checkboxContainer";
+
+    // Generar checkboxes de A-Z
+    for (let i = 65; i <= 90; i++) {
+        agregarCheckbox(checkboxContainer, String.fromCharCode(i));
+    }
+
+    // Agregar checkbox para la letra Ñ
+    agregarCheckbox(checkboxContainer, "Ñ");
+
+    // Botón para eliminar zona
+
+   
+
+    return checkboxContainer;
 }
-generarInputsChec()
+function agregarCheckbox(container, letra) {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'filas';
+    checkbox.value = letra;
+    checkbox.id = letra;
+
+    const label = document.createElement('label');
+    label.htmlFor = letra;
+    label.textContent = letra;
+
+    checkbox.addEventListener('change', manejarInputsAsientos);
+
+    container.appendChild(checkbox);
+    container.appendChild(label);
+    container.appendChild(document.createElement('br'));
+}
+// Función para crear una zona sin asientos
+function crearZonaSinAsientos() {
+    const divZona = document.createElement("div");
+    divZona.classList.add("zona-sin-asiento");
+
+    const labelNombre = document.createElement("label");
+    labelNombre.textContent = "Nombre de la Zona:";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.classList.add("zona_nombre");
+    input.required = true;
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "Eliminar Zona";
+    btnEliminar.classList.add("btn-eliminar-zona");
+    btnEliminar.addEventListener("click", function () {
+        divZona.remove();
+    });
+
+    divZona.appendChild(labelNombre);
+    divZona.appendChild(input);
+    divZona.appendChild(btnEliminar);
+
+    return divZona;
+}
+
 document.addEventListener("change", (event) => {
     if (event.target && event.target.matches('#checkboxContainer input[name="filas"]')) {
         const contenedorPadre = event.target.closest(".contenedor-zonas"); // Encuentra el contenedor padre más cercano
             manejarInputsAsientos(event.target,contenedorPadre); // Llama la función cuando un checkbox cambie
     }
 });
-function agregarOtraZona() {
-    const contenedor = document.getElementById('contenedor-padre-zonas');
-    
-    // Crear una línea separadora (hr)
-    const hr = document.createElement("hr");
-    contenedor.appendChild(hr);
 
-    // Seleccionar el contenedor original y clonar
-    const contenedorZonas = document.querySelector(".contenedor-zonas");
-    const contenedorClonado = contenedorZonas.cloneNode(true); // Clona el contenedor y sus hijos
-
-    // Limpiar los valores de los inputs dentro del contenedor clonado
-    const inputs = contenedorClonado.querySelectorAll("input");
-    inputs.forEach(input => {
-        input.checked = false; // Desmarcar los checkboxes
-    });
-
-    // Limpiar los elementos dentro de inputsContainer solo en el contenedor clonado
-    const inputsContainer = contenedorClonado.querySelector("#inputsContainer"); // Selecciona solo el inputsContainer dentro del contenedor clonado
-    if (inputsContainer) {
-        inputsContainer.innerHTML = ""; // Vaciar los contenidos del contenedor
-    }
-    const buttClonado=contenedorClonado.querySelector("#eliminar")
-    if(buttClonado){
-        buttClonado.remove()
-    }
-    const button = document.createElement("button");
-    button.id = "eliminar";
-    button.textContent = "Eliminar Zona"; // Establecer el texto del botón
-    
-    // Agregar un evento al botón para eliminar el contenedor clonado
-    button.addEventListener('click', function() {
-        // Confirmación antes de eliminar
-        const confirmacion = confirm("¿Estás seguro de que quieres eliminar esta zona?");
-        
-        // Si se confirma, eliminar el contenedor clonado
-        if (confirmacion) {
-            contenedorClonado.remove(); // Elimina solo el contenedor clonado
-            alert("Zona eliminada con éxito.");
-        } else {
-            alert("La eliminación ha sido cancelada.");
-        }
-    });
-    contenedorClonado.appendChild(button)
-    // Añadir el contenedor clonado y el botón de eliminar al contenedor principal
-    contenedor.appendChild(contenedorClonado);
-}
 document.getElementById('eliminar').addEventListener('click', () => {
     const confirmacion = confirm("¿Estás seguro de que quieres eliminar esta zona?");
     
@@ -153,110 +183,6 @@ document.getElementById('eliminar').addEventListener('click', () => {
         alert("La eliminación ha sido cancelada.");
     }
 });
-
-function generarInputsChec(){
-    const checkboxContainer = document.getElementById('checkboxContainer');
-
-    // Generar casillas de verificación de A a Z
-    for (let i = 65; i <= 90; i++) {
-        const letra = String.fromCharCode(i);
-        
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.name = 'filas';
-    checkbox.value = letra;
-    checkbox.id = letra;
-    
-    const label = document.createElement('label');
-    label.htmlFor = letra;
-    label.textContent = letra;
-    
-    checkbox.addEventListener('change', function () {
-        manejarInputsAsientos();
-    });
-
-    checkboxContainer.appendChild(checkbox);
-    checkboxContainer.appendChild(label);
-    checkboxContainer.appendChild(document.createElement('br'));
-}
-
-// Agregar casilla para la letra Ñ
-const checkboxn = document.createElement('input');
-checkboxn.type = 'checkbox';
-checkboxn.name = 'filas';
-checkboxn.value = 'Ñ';
-checkboxn.id = 'Ñ';
-
-const labeln = document.createElement('label');
-labeln.htmlFor = 'Ñ';
-labeln.textContent = 'Ñ';
-
-checkboxn.addEventListener('change', function () {
-    manejarInputsAsientos();
-});
-
-checkboxContainer.appendChild(checkboxn);
-checkboxContainer.appendChild(labeln);
-checkboxContainer.appendChild(document.createElement('br'));
-}
-function agregarZonaSinAsiento() {  
-    const contenedor = document.getElementById('contenedor-padre-zonas');
-
-    if (!contenedor) {
-        console.error("Error: No se encontró el contenedor con ID 'contenedor-padre-zonas'");
-        return;
-    }
-
-    // Crear un div contenedor para los elementos
-    const divZona = document.createElement("div");
-    divZona.classList.add("zona-sin-asiento");
-
-    // Verificar si el select con la clase 'zona_nombre' existe
-    const selectOriginal = document.querySelector('.zona_nombre');
-    if (selectOriginal) {
-        // Clonar el select con clase 'zona_nombre'
-        const selectClonado = selectOriginal.cloneNode(true);
-
-        // Crear el label para el nombre de la zona
-        const labelNombre = document.createElement("label");
-        labelNombre.setAttribute("for", "zona");
-        labelNombre.textContent = "Nombre de la Zona:";
-
-        // Crear el label para la cantidad de asientos
-        const label = document.createElement("label");
-        label.setAttribute("for", "cantidad");
-        label.textContent = "Cantidad de Asientos:";
-
-        // Crear el input
-        const input = document.createElement("input");
-        input.type = "number";
-        input.classList.add("cantidad_asientos");
-        input.min = "1";
-        input.required = true;
-        input.placeholder = "Cantidad de boletos";
-
-        // Crear botón para eliminar la zona
-        const btnEliminar = document.createElement("button");
-        btnEliminar.textContent = "Eliminar Zona";
-        btnEliminar.classList.add("btn-eliminar-zona");
-        btnEliminar.addEventListener("click", function() {
-            divZona.remove();
-        });
-
-        // Agregar elementos al divZona
-        divZona.appendChild(labelNombre);
-        divZona.appendChild(selectClonado); // Agregar el select clonado
-        divZona.appendChild(label);
-        divZona.appendChild(input);
-        divZona.appendChild(btnEliminar); // Agregar el botón de eliminar
-
-        // Agregar el divZona al contenedor principal
-        contenedor.appendChild(divZona);
-    } else {
-        console.error("Error: No se encontró el elemento select con la clase 'zona_nombre'");
-    }
-}
-
 // Función para agregar o eliminar inputs según la selección de checkboxes
 function manejarInputsAsientos(elemento, contenedorCheck) {
     // Buscar el contenedor dentro del contenedorCheck
@@ -267,6 +193,7 @@ function manejarInputsAsientos(elemento, contenedorCheck) {
         console.error("Error: No se encontró #inputsContainer dentro de contenedorCheck.");
         return; // Detiene la ejecución para evitar errores
     }
+    const capacidadMaxima = parseInt(contenedorCheck.getAttribute("data-capacidad"), 10) || 0;
 
     const idDiv = `input-container-${elemento.value}`;
     let divExistente = contenedorsub.querySelector(`#${idDiv}`);
@@ -482,7 +409,6 @@ function obtenerDatosAsientos() {
         alert("Por favor, completa todos los campos obligatorios (tipo de asiento, recinto y función).");
         return false;
     }
-
     // Si todo es válido, agregar los datos al arreglo final
     datos.push({
         datos: dataAsientos,
@@ -492,6 +418,7 @@ function obtenerDatosAsientos() {
         recintoId: recintoId,
         funcion_even: funcion
     });
+    console.log(datos);
 
     return datos;
 }

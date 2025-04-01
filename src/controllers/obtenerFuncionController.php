@@ -44,7 +44,8 @@ class obtenerFuncionController
 
             $zonas[] = [
                 'nombre_zona' => $zona['nombre_zona'],
-                
+                'tipo'=> $zona['tipo'],
+                'capacidad' => $zona['capacidad'],
             ];
                 
             

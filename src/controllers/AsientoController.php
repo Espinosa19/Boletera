@@ -16,31 +16,37 @@ class AsientoController
         $this->recintoModel=new Recinto();
     }
 
-    public function obtenerTodos()
-    {
-        try {
-            $asientos = $this->asientoModel->obtenerTodos(); 
-            $recintoConNombre = [];
-    
+    public function obtenerTodos($pagina = 1, $limite = 10)
+{
+    try {
+        $salto = ($pagina - 1) * $limite; // Calcular el desplazamiento
+
+        // Obtener asientos con paginación
+        $asientos = $this->asientoModel->obtenerTodos($limite, $salto);
+
+        $recintoConNombre = [];
         foreach ($asientos as $asiento) {
             try {
-                $mongoId = new MongoDB\BSON\ObjectId($asiento['recinto_id']);
-                $recinto = $this->recintoModel->obtenerRecintoPorId($mongoId);
-    
-                // Agregar el nombre del usuario si se encontró
-                $asiento['nombre_recinto'] = $recinto ? $recinto['nombre'] : 'Desconocido';
+                if (!isset($asiento['recinto_id'])) {
+                    $asiento['nombre_recinto'] = 'Sin recinto';
+                } else {
+                    $mongoId = (string)$asiento['recinto_id'];
+                    $recinto = $this->recintoModel->obtenerRecintoPorId($mongoId);
+                    $asiento['nombre_recinto'] = $recinto ? $recinto['nombre'] : 'Desconocido';
+                }
             } catch (Exception $e) {
                 $asiento['nombre_recinto'] = 'ID inválido';
             }
-    
+
             $recintoConNombre[] = $asiento;
         }
-    
-            return $recintoConNombre;
-        } catch (Exception $e) {
-            return ['error' => $e->getMessage()];
-        }
+
+        return $recintoConNombre;
+    } catch (Exception $e) {
+        return ['error' => $e->getMessage()];
     }
+}
+
     public function obtenerPorId($id){
         return $this->asientoModel->obtenerPorId($id);
     }
@@ -77,10 +83,8 @@ class AsientoController
         if (!isset($asientos['datos']) || !is_array($asientos['datos'])) {
             return ['error' => 'Datos inválidos o estructura incorrecta'];
         }
-    
-        // Convertir IDs a ObjectId
         $recintoId = new ObjectId($asientos['recintoId']);
-        $evento=new ObjectId($asiento['evento']);
+        $evento=new ObjectId($asientos['evento']);
         $tipoAsientoId = new ObjectId($asientos['tipoAsientoId']);
         $funcion_even = new ObjectId($asientos['funcion_even']);
         $tipoAsiento = $this->tipoAsientoModel->obtenerPorId($tipoAsientoId);

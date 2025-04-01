@@ -56,9 +56,12 @@ if(!empty($_SESSION['datos-token'])){
         $tipos = $tipoController->obtenerTiposAsientos();
     } 
     else if ($uri == 'perfil_protegido/asientos-tabla.php') {
+        $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
         $permisos = $tokenController->validarToken($_SESSION['datos-token']);
         verificacionAcceso($permisos);
-        $asientos = $asientoController->obtenerTodos();
+        $limite = 10; // Cambia esto según lo que necesites
+
+        $asientos = $asientoController->obtenerTodos($pagina, $limite);
     } 
     else if ($uri =='perfil_protegido/compra.php') {
         $permisos = $tokenController->validarToken($_SESSION['datos-token']);

@@ -66,6 +66,7 @@ switch ($method) {
                             echo json_encode(['status'=>false]);
                             exit();
                         }
+
                     }
                     
                 }
