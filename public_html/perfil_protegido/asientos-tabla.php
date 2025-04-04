@@ -155,6 +155,7 @@ $asientosPaginados = array_slice($asientos, $offset, $asientosPorPagina);
         <h1>Gestión de Asientos</h1>
         <input type="text" id="searchInput" placeholder="Buscar asiento..." onkeyup="filtrarAsientos()">
         <a href="./asientos.php" class="btn btn-success">Agregar Nuevo Asiento</a>
+        <a href="./asientos-reiniciar.php" class="btn btn-success">Reiniciar Asientos</a>
         <table>
             <thead>
                 <tr>

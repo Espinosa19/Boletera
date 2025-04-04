@@ -66,44 +66,44 @@ class EventoController {
                 }
     
                 // Convertir ObjectId en funciones a string
-                foreach ($recinto['funciones'] as &$funcion) {
-                    if (isset($funcion['id']) && $funcion['id'] instanceof MongoDB\BSON\ObjectId) {
-                        $funcion['id'] = (string) $funcion['id'];
-                    }
-                }
+              
             }
     
             $respuesta = [];
             if (!$id) {
 
-                // Buscar funciones del recinto específico
                 foreach ($evento['recintos'] as $recinto) {
-                    $recinto_id=$recinto['id'];
+                    $recinto_id = $recinto['id'];
                     foreach ($recinto['funciones'] as $funcion) {
                         $fecha_inicio = isset($funcion['fecha_inicio']) ? $funcion['fecha_inicio'] : null;
                         $fecha_fin = isset($funcion['fecha_fin']) ? $funcion['fecha_fin'] : null;
-
+                
                         // Convertir UTCDateTime a formato legible
                         if ($fecha_inicio instanceof MongoDB\BSON\UTCDateTime) {
                             $fecha_inicio = $fecha_inicio->toDateTime()->format('Y-m-d H:i');
                         }
-
+                
                         if ($fecha_fin instanceof MongoDB\BSON\UTCDateTime) {
                             $fecha_fin = $fecha_fin->toDateTime()->format('Y-m-d H:i');
                         }
-
-                        // Agregar la función a la respuesta
-                        $respuesta[] = [
-                            "_id" => $funcion['id'],
-                            'recinto'=>$recinto_id,
-                            'nombre' => $evento['nombre'],
-                            'fecha_inicio' => $fecha_inicio,
-                            'fecha_fin' => $fecha_fin,
-                        ];
-                        
-                    }
                 
-            }
+                        // Verificar si el elemento ya existe en la respuesta
+                        if (!array_filter($respuesta, fn($item) =>
+                            $item['_id'] === $funcion['id'] &&
+                            $item['fecha_inicio'] === $fecha_inicio &&
+                            $item['fecha_fin'] === $fecha_fin
+                        )) {
+                            // Agregar la función a la respuesta si no existe
+                            $respuesta[] = [
+                                "_id" => $funcion['id'],
+                                'recinto' => $recinto_id,
+                                'nombre' => $evento['nombre'],
+                                'fecha_inicio' => $fecha_inicio,
+                                'fecha_fin' => $fecha_fin,
+                            ];
+                        }
+                    }
+                }
         }
             else{
                 foreach ($evento['recintos'] as $recinto) {

@@ -56,14 +56,18 @@ require dirname(__DIR__,2) . "/src/routes.php";
         }
 
         .modal-content {
+            gap: 15px;
+            display: flex
+        ;
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
-            margin: 0% auto;
-            max-height: 544px;
-    overflow-y: auto;
+            margin: auto auto;
+            max-height:  415px;
+            overflow-y: auto;
+            flex-direction: column;
             width: 40%;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         label {
@@ -145,21 +149,10 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <!-- Modal para agregar una nueva zona -->
 <div id="zonaModal" class="modal">
     <div class="modal-content">
-    <h2>Gestión de Recinto</h2>
+    <h2>Reiniciar Asiento</h2>
 
-        <h2>Agregar Nueva Zona</h2>
          <div class="flex-container">
-            <div>
-                <label for="tipoAsiento">Tipo de Asiento:</label>
-                <select class="tipo_asiento_id" id="tipoAsiento_s" required>
-                    <option value="">Seleccione un tipo de asiento</option>
-                    <?php foreach ($tipos as $tipoAsiento): ?>
-                        <option value="<?php echo htmlspecialchars($tipoAsiento['_id']); ?>">
-                            <?php echo htmlspecialchars($tipoAsiento['nombre']); ?> - Precio: <?php echo htmlspecialchars($tipoAsiento['precio']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+           
             <div>
                 <label for="evento">Evento:</label>
                 <select class="evento" id="evento" required>
@@ -181,17 +174,17 @@ require dirname(__DIR__,2) . "/src/routes.php";
                     
                 </select>
             </div>
-    <div id="contenedor-padre-zonas">
+            <div id="contenedor-padre-zonas">
 
        
-    </div>
+</div>
     
 <!-- Contenedor para los inputs dinámicos -->
         <button id="obtenerDatosBtn">Agregar</button>
         <button id="closeModalBtn">Cerrar</button>
     </div>
 </div>
-<script src="../assets/js/crudasiento.js"></script>
+<script src="../assets/js/crudAsientoReiniciarAsi.js"></script>
 
 </body>
 </html>

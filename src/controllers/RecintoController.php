@@ -32,7 +32,6 @@ class RecintoController {
                 'nombre_zona' => $zona['nombre_zona'],
                 'tipo' => $zona['tipo'],
                 'capacidad' => (int)$zona['capacidad'],
-                'precio_default' => (float)$zona['precio_default'],
                 'descripcion' => $zona['descripcion']
             ];
         }
@@ -67,7 +66,6 @@ class RecintoController {
                 'nombre_zona' => $zona['nombre_zona'],
                 'tipo' => $zona['tipo'],
                 'capacidad' => (int)$zona['capacidad'],
-                'precio_default' => (float)$zona['precio_default'],
                 'descripcion' => $zona['descripcion']
             ];
         }

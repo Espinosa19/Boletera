@@ -41,8 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <label>Capacidad:</label>
             <input type="number" name="capacidad_zona[]" required><br>
 
-            <label>Precio Default:</label>
-            <input type="number" name="precio_default[]" required><br>
 
             <label>Descripción:</label>
             <textarea name="descripcion[]" required></textarea><br>
@@ -90,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 nombre_zona: zonaDiv.querySelector('[name="nombre_zona[]"]').value.trim(),
                 tipo: zonaDiv.querySelector('[name="tipo[]"]').value,
                 capacidad: parseInt(zonaDiv.querySelector('[name="capacidad_zona[]"]').value.trim(), 10),
-                precio_default: parseFloat(zonaDiv.querySelector('[name="precio_default[]"]').value.trim()),
                 descripcion: zonaDiv.querySelector('[name="descripcion[]"]').value.trim()
             });
         });
@@ -346,8 +343,7 @@ function addZoneToForm(zona, index) {
         <label for="tipo">Tipo:</label>
         <input type="text" id="tipo" name="tipo[]" value="${zona.tipo}" required>
 
-        <label for="precio_default">Precio Default:</label>
-        <input type="number" id="precio_default" name="precio_default[]" value="${zona.precio_default}" required>
+       
     `;
 
     // Agregar el nuevo div al contenedor de zonas

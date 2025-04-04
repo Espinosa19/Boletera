@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require dirname(__DIR__,3) . '/src/controllers/AsientoController.php';
 require dirname(__DIR__,3) . '/src/controllers/RecintoController.php';
 require dirname(__DIR__,3) . '/src/controllers/TipoAsientoController.php';
@@ -32,6 +36,7 @@ switch ($method) {
         break;
 
         case 'POST':
+            $resultado;
             $datas = json_decode(file_get_contents("php://input"), true);
         
             if (isset($_POST['id']) && isset($_POST['nuevo_estado'])) {
@@ -59,12 +64,14 @@ switch ($method) {
                             echo json_encode(['status'=>false]);
                             exit();
                         }
+                        
                     } 
                     if(!empty($data['datos'])) {
                         $resultado = $controller->insertarAsiento($data);
+                        echo json_encode($resultado);
+                        exit();
                         if(!$resultado['status']){
                             echo json_encode(['status'=>false]);
-                            exit();
                         }
 
                     }
@@ -72,8 +79,9 @@ switch ($method) {
                 }
                 
             }
-            echo json_encode(['status'=>true]);
+            echo json_encode($resultado);
             exit();
+
             break;
         
     case 'PUT':

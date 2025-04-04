@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 document.getElementById("evento").addEventListener("change", function () { 
+    const contenedor_padre_zonas = document.getElementById("contenedor-padre-zonas");
+    contenedor_padre_zonas.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevas zonas
     const evento = this.value; // Usamos `this.value` dentro de una función normal
     if (evento) {
         fetch(`./apis/apiof.php?evento_id=${evento}`) // Usamos `evento` en lugar de `recintoId`
@@ -59,39 +61,76 @@ document.getElementById("recinto2").addEventListener("change", function () {
                 data.zonas.forEach(zona => {
                     let capacidad = zona.capacidad || 0; // Usar 0 si no hay capacidad definida
                     // Crear un nuevo contenedor para cada zona
-                    const contenedor_zonas = document.createElement("div");
-                    contenedor_zonas.classList.add("contenedor-zonas"); // Usar una clase en lugar de un ID para evitar duplicados
-                    contenedor_zonas.setAttribute("data-capacidad", capacidad); // Agregar capacidad como atributo
-
-                    const nombreZonaElement = document.createElement("label");
-                    nombreZonaElement.textContent = "Nombre de la Zona:";
-                    contenedor_zonas.appendChild(nombreZonaElement);
-
-                    const zonas = document.createElement("div");
-                    zonas.classList.add("zonas"); // Usar una clase en lugar de un ID para evitar duplicados
-
-                    const select = document.createElement("select");
-                    select.classList.add("zona_nombre");
-                    const option = document.createElement("option");
-                    option.value = zona.nombre_zona;
-                    option.textContent = zona.nombre_zona;
-                    select.appendChild(option);
-                    contenedor_zonas.appendChild(select);
+                   // Agregar capacidad como atributo
+                   
+                    
 
                     // Agregar contenido según el tipo de zona
                     if (zona.tipo === "Asiento") {
+                        const contenedor_zonas = document.createElement("div");
+                        contenedor_zonas.classList.add("contenedor-zonas"); 
+                        const nombreZonaElement = document.createElement("label");
+                        nombreZonaElement.textContent = "Nombre de la Zona:";
+                        contenedor_zonas.appendChild(nombreZonaElement);
+
+                        const zonas = document.createElement("div");
+                        zonas.classList.add("zonas"); // Usar una clase en lugar de un ID para evitar duplicados
+
+                        const select = document.createElement("select");
+                        select.classList.add("zona_nombre");
+                        const option = document.createElement("option");
+                        option.value = zona.nombre_zona;
+                        option.textContent = zona.nombre_zona;
+                        select.appendChild(option);
+                        contenedor_zonas.appendChild(select);
+                        contenedor_zonas.setAttribute("data-capacidad", capacidad);
+
                         contenedor_zonas.appendChild(crearZonaConAsientos());
                         
                         const input = document.createElement("div");
                         input.id="inputsContainer";
                         contenedor_zonas.appendChild(input);
                         contenedor_zonas.appendChild(document.createElement("hr"));
-                    } else if (zona.tipo === "sin_asiento") {
-                        contenedor_zonas.appendChild(crearZonaSinAsientos());
+                        contenedor_padre_zonas.appendChild(contenedor_zonas);
+
+                    } 
+                    if (zona.tipo === "Pie") {
+                        const contenedorSin_asiento = document.createElement("div");
+                        contenedorSin_asiento.classList.add("zona-sin-asiento");
+                        const nombreZonaElement = document.createElement("label");
+                        nombreZonaElement.textContent = "Nombre de la Zona:";
+                        contenedorSin_asiento.appendChild(nombreZonaElement);
+
+                        const zonas = document.createElement("div");
+                        zonas.classList.add("zonas"); // Usar una clase en lugar de un ID para evitar duplicados
+
+                        const select = document.createElement("select");
+                        select.classList.add("zona_nombre");
+                        const option = document.createElement("option");
+                        option.value = zona.nombre_zona;
+                        option.textContent = zona.nombre_zona;
+                        select.appendChild(option);
+                        contenedorSin_asiento.appendChild(select);
+                        contenedorSin_asiento.setAttribute("data-capacidad", capacidad);
+
+                        console.log("Zona sin asientos");
+                        const labelNombre = document.createElement("label");
+                        labelNombre.textContent = "Cantidad de asientos:";
+                    
+                        const input = document.createElement("input");
+                        input.type = "number";
+                        input.className="cantidad_asientos";
+                        input.required = true;
+                    
+                        
+                    
+                        contenedorSin_asiento.appendChild(labelNombre);
+                        contenedorSin_asiento.appendChild(input);
+                        contenedor_padre_zonas.appendChild(contenedorSin_asiento);
+
                     }
 
                     // Agregar el contenedor de la zona al contenedor padre
-                    contenedor_padre_zonas.appendChild(contenedor_zonas);
                 });
             })
             .catch(error => {
@@ -136,65 +175,23 @@ function agregarCheckbox(container, letra) {
     container.appendChild(label);
     container.appendChild(document.createElement('br'));
 }
-// Función para crear una zona sin asientos
-function crearZonaSinAsientos() {
-    const divZona = document.createElement("div");
-    divZona.classList.add("zona-sin-asiento");
 
-    const labelNombre = document.createElement("label");
-    labelNombre.textContent = "Nombre de la Zona:";
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.classList.add("zona_nombre");
-    input.required = true;
-
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "Eliminar Zona";
-    btnEliminar.classList.add("btn-eliminar-zona");
-    btnEliminar.addEventListener("click", function () {
-        divZona.remove();
-    });
-
-    divZona.appendChild(labelNombre);
-    divZona.appendChild(input);
-    divZona.appendChild(btnEliminar);
-
-    return divZona;
-}
 
 document.addEventListener("change", (event) => {
     if (event.target && event.target.matches('#checkboxContainer input[name="filas"]')) {
-        const contenedorPadre = event.target.closest(".contenedor-zonas"); // Encuentra el contenedor padre más cercano
+        const contenedorPadre = event.target.closest(".contenedor-zonas"); 
+        console.log(contenedorPadre);
             manejarInputsAsientos(event.target,contenedorPadre); // Llama la función cuando un checkbox cambie
     }
-});
-
-document.getElementById('eliminar').addEventListener('click', () => {
-    const confirmacion = confirm("¿Estás seguro de que quieres eliminar esta zona?");
-    
-    if (confirmacion) {
-        const contenedorZonas = document.querySelector('.contenedor-zonas');
-        if (contenedorZonas) {
-            contenedorZonas.remove(); // Elimina el contenedor .contenedor-zonas
-            alert("Zona eliminada con éxito.");
-        }
-    } else {
-        alert("La eliminación ha sido cancelada.");
-    }
-});
-// Función para agregar o eliminar inputs según la selección de checkboxes
-function manejarInputsAsientos(elemento, contenedorCheck) {
-    // Buscar el contenedor dentro del contenedorCheck
+});function manejarInputsAsientos(elemento, contenedorCheck) {
     const contenedorsub = contenedorCheck.querySelector('#inputsContainer');
-
-    // Verificar si el contenedor existe
+    
     if (!contenedorsub) {
         console.error("Error: No se encontró #inputsContainer dentro de contenedorCheck.");
-        return; // Detiene la ejecución para evitar errores
+        return;
     }
-    const capacidadMaxima = parseInt(contenedorCheck.getAttribute("data-capacidad"), 10) || 0;
 
+    const capacidadMaxima = parseInt(contenedorCheck.getAttribute("data-capacidad"), 10) || 0;
     const idDiv = `input-container-${elemento.value}`;
     let divExistente = contenedorsub.querySelector(`#${idDiv}`);
 
@@ -204,100 +201,124 @@ function manejarInputsAsientos(elemento, contenedorCheck) {
             div.classList.add('flex-container');
             div.id = idDiv;
 
-            // Crear un contenedor adicional para los inputs
-            const divColumna2=document.createElement("div")
+            const divColumna2 = document.createElement("div");
             const divSub = document.createElement("div");
             divSub.classList.add('contenedor-sub');
 
-            // Crear input para asientoInicio
             const divInicio = document.createElement('div');
             const labelInicio = document.createElement('label');
             labelInicio.textContent = `Asientos desde (${elemento.value}):`;
             const inputInicio = document.createElement('input');
             inputInicio.type = 'number';
             inputInicio.min = '1';
-            inputInicio.max = '30';
+            inputInicio.max = "100";
             inputInicio.classList.add('asientoInicio');
             inputInicio.dataset.fila = elemento.value;
 
             divInicio.appendChild(labelInicio);
             divInicio.appendChild(inputInicio);
 
-            // Crear input para asientoFin
             const divFin = document.createElement('div');
             const labelFin = document.createElement('label');
             labelFin.textContent = `hasta (${elemento.value}):`;
             const inputFin = document.createElement('input');
             inputFin.type = 'number';
             inputFin.min = '1';
-            inputFin.max = '30';
+            inputFin.max = "100";
             inputFin.classList.add('asientoFin');
             inputFin.dataset.fila = elemento.value;
 
             divFin.appendChild(labelFin);
             divFin.appendChild(inputFin);
 
-            // Crear div de limitación
             const divLimitacion = document.createElement("div");
             const inputlabelimitacion = document.createElement('label');
-            inputlabelimitacion.setAttribute("for", "limitacion"); // Corregido
+            inputlabelimitacion.setAttribute("for", "limitacion");
             inputlabelimitacion.textContent = "Colocar una limitación";
             const inputLimitacion = document.createElement("input");
-            inputLimitacion.classList.add("limitacion"); // Corregido
-            inputLimitacion.placeholder = "Colocar una limitacion";
+            inputLimitacion.classList.add("limitacion");
+            inputLimitacion.placeholder = "Colocar una limitación";
             inputLimitacion.type = 'number';
 
-            // Crear botón para agregar limitación
             const divButtonLimitacion = document.createElement("button");
             divButtonLimitacion.classList.add('agregar-limitacion');
             divButtonLimitacion.textContent = "Agregar Limitación";
 
-            // Crear botón para eliminar limitación
             const divButtonEliminarLimitacion = document.createElement("button");
             divButtonEliminarLimitacion.classList.add('eliminar-limitacion');
             divButtonEliminarLimitacion.textContent = "Eliminar Limitación";
 
-            // Evento de clic para agregar un nuevo contenedor de limitación
-            divButtonLimitacion.addEventListener('click', function() {
+            divButtonLimitacion.addEventListener('click', function () {
                 const nuevaLimitacion = document.createElement("div");
                 const labelNuevaLimitacion = document.createElement('label');
                 labelNuevaLimitacion.textContent = "Colocar una limitación adicional";
                 const inputNuevaLimitacion = document.createElement("input");
                 inputNuevaLimitacion.classList.add("limitacion");
-                inputNuevaLimitacion.placeholder = "Colocar una limitacion adicional";
+                inputNuevaLimitacion.placeholder = "Colocar una limitación adicional";
                 inputNuevaLimitacion.type = 'number';
 
                 nuevaLimitacion.appendChild(labelNuevaLimitacion);
                 nuevaLimitacion.appendChild(inputNuevaLimitacion);
 
-                // Añadir el nuevo contenedor de limitación dentro de divSub
                 divSub.appendChild(nuevaLimitacion);
             });
 
-            // Evento de clic para eliminar la última limitación
-            divButtonEliminarLimitacion.addEventListener('click', function() {
+            divButtonEliminarLimitacion.addEventListener('click', function () {
                 const limitaciones = divSub.querySelectorAll('.limitacion');
                 if (limitaciones.length > 0) {
                     const lastLimitacion = limitaciones[limitaciones.length - 1].parentElement;
-                    divSub.removeChild(lastLimitacion); // Elimina el último contenedor de limitación
+                    divSub.removeChild(lastLimitacion);
                 }
             });
 
-            // Añadir los elementos creados al divLimitacion
+            // Evento de input para calcular el total de asientos en el contenedor
+            function recalcularTotalAsientos() {
+                let totalAsientosInicio = 0;
+                let totalAsientosFin = 0;
+                let totalAsientos = 0;
+                // Seleccionar todos los inputs de inicio y fin dentro de #contenedor-zonas
+                const inputsInicio = contenedorCheck.querySelectorAll('.asientoInicio');
+                const inputsFin = contenedorCheck.querySelectorAll('.asientoFin');
+                const limitaciones = contenedorCheck.querySelectorAll('.limitacion');
+                const limitacionValues = limitaciones.length;
+
+                // Iterar sobre los inputs de inicio y fin y calcular el total
+                inputsInicio.forEach(input => {
+                    const inicio = parseInt(input.value, 10) || 0;
+                    totalAsientosInicio += inicio;
+                });
+
+                inputsFin.forEach(input => {
+                    const fin = parseInt(input.value, 10) || 0;
+                    totalAsientosFin += fin;
+                });
+                totalAsientos = totalAsientosFin - totalAsientosInicio + 1; // +1 para incluir el asiento de inicio
+
+                // Ajuste por las limitaciones
+                totalAsientos -= limitacionValues;
+
+
+                // Validación de la capacidad máxima
+                if (totalAsientos > capacidadMaxima) {
+                    alert(`El total de asientos (${totalAsientos}) excede la capacidad máxima (${capacidadMaxima}).`);
+                }
+            }
+
+            // Llamar a la función de recalcular cada vez que un input cambie
+            inputInicio.addEventListener('input', recalcularTotalAsientos);
+            inputFin.addEventListener('input', recalcularTotalAsientos);
+
             divLimitacion.appendChild(inputlabelimitacion);
             divLimitacion.appendChild(inputLimitacion);
+            divColumna2.appendChild(divButtonLimitacion);
+            divColumna2.appendChild(divButtonEliminarLimitacion);
 
-            // Agregar los divs de inputs al contenedor principal
             divSub.appendChild(divInicio);
             divSub.appendChild(divFin);
             divSub.appendChild(divLimitacion);
-            divColumna2.appendChild(divButtonLimitacion);
-            divColumna2.appendChild(divButtonEliminarLimitacion)
-            // Agregar el contenedor y los botones a la estructura final
             div.appendChild(divSub);
             div.appendChild(divColumna2);
 
-            // Finalmente agregar el div creado al contenedor principal
             contenedorsub.appendChild(div);
         }
     } else {
@@ -314,13 +335,14 @@ function obtenerDatosAsientos() {
 
     const bloquesAsientos = document.querySelectorAll('.contenedor-zonas');
     const bloquesSinAsientos = document.querySelectorAll('.zona-sin-asiento');
+    let matrizLimitaciones = []; // Matriz para almacenar las limitaciones por letra
 
     // Verificamos si existen zonas con asientos
     if (bloquesAsientos.length > 0) {
         for (const zona of bloquesAsientos) {
-            let rangoTotal = 0; // Se usa let para acumular valores correctamente
-            const limitaciones = [];
+            let rangoTotal = []; // Se usa let para acumular valores correctamente
             const filas = [];
+            const limitacionesPorLetra = {}; // Objeto para almacenar las limitaciones por letra en esta zona
 
             const nombreZonaElement = zona.querySelector('.zona_nombre');
             const nombreZona = nombreZonaElement ? nombreZonaElement.value.trim() : "";
@@ -330,9 +352,11 @@ function obtenerDatosAsientos() {
             }
 
             const inputsContainer = zona.querySelectorAll(".flex-container");
+            console.log(inputsContainer);
             for (const item of inputsContainer) {
                 const inputInicioElement = item.querySelector('.asientoInicio');
                 const inputFinElement = item.querySelector('.asientoFin');
+                const letra = item.querySelector('.asientoInicio')?.dataset.fila; // Obtener la letra asociada
 
                 if (!inputInicioElement || !inputFinElement) {
                     alert("Falta uno de los campos de asientos.");
@@ -341,7 +365,6 @@ function obtenerDatosAsientos() {
 
                 const inputInicio = parseInt(inputInicioElement.value, 10);
                 const inputFin = parseInt(inputFinElement.value, 10);
-                const fila = inputInicioElement.getAttribute("data-fila");
 
                 if (isNaN(inputInicio) || isNaN(inputFin)) {
                     alert("Por favor, ingresa valores válidos para 'Asiento desde' y 'Asiento hasta'.");
@@ -353,26 +376,43 @@ function obtenerDatosAsientos() {
                     return false;
                 }
 
-                if (fila) filas.push(fila);
 
+                // Procesar las limitaciones para esta letra
+                const limitaciones = [];
                 item.querySelectorAll('.limitacion').forEach(lim => {
-                    const limitacionValue = lim.value.trim();
-                    if (limitacionValue) limitaciones.push(limitacionValue);
+                    const limitacionValue = parseInt(lim.value.trim(), 10);
+                    if (!isNaN(limitacionValue)) {
+                        limitaciones.push(limitacionValue);
+                    }
                 });
 
-                rangoTotal += (inputFin - inputInicio);
+                // Almacenar las limitaciones por letra
+                limitacionesPorLetra[letra] = limitaciones;
+
+                rangoTotal.push(
+                    {fila:letra,rangoInicio:inputInicio, rangoFin:inputFin}
+                );
             }
 
-            if (rangoTotal === 0) {
-                alert("Por favor, ingresa al menos un rango válido de asientos.");
-                return false;
-            }
+            // Convertir el objeto de limitaciones por letra en un formato de matriz
+            const limitacionesMatriz = Object.entries(limitacionesPorLetra).map(([letra, limitaciones]) => ({
+                letra,
+                limitaciones,
+                totalLimitaciones: limitaciones.length
+            }));
+
+            matrizLimitaciones.push({
+                zona: nombreZona,
+                limitaciones: limitacionesMatriz
+            });
+
+
+           
 
             dataAsientos.push({
                 zona: nombreZona,
-                rango: rangoTotal,
-                filas: filas,
-                limitaciones: limitaciones
+                caracteristicas: rangoTotal,
+                limitaciones: limitacionesMatriz
             });
         }
     }
@@ -404,7 +444,7 @@ function obtenerDatosAsientos() {
     const select = document.getElementById("recinto2"); // Reemplaza "miSelect" con el ID real
     const opcionSeleccionada = select.options[select.selectedIndex];
     const funcion = opcionSeleccionada.getAttribute("data-funcion");
-    const e=document.getElementById("evento").value.trim();
+    const e = document.getElementById("evento").value.trim();
     if (!tipoAsientoId || !recintoId || !funcion) {
         alert("Por favor, completa todos los campos obligatorios (tipo de asiento, recinto y función).");
         return false;
@@ -413,7 +453,7 @@ function obtenerDatosAsientos() {
     datos.push({
         datos: dataAsientos,
         datosSin: dataSinAsientos.length > 0 ? dataSinAsientos : null,
-        evento:e,
+        evento: e,
         tipoAsientoId: tipoAsientoId,
         recintoId: recintoId,
         funcion_even: funcion
@@ -422,7 +462,6 @@ function obtenerDatosAsientos() {
 
     return datos;
 }
-
 document.getElementById("obtenerDatosBtn").onclick = async function() {
     const confirmarEnvio = confirm("¿Estás seguro de que deseas enviar los datos?");
     if (!confirmarEnvio) {
@@ -441,10 +480,10 @@ document.getElementById("obtenerDatosBtn").onclick = async function() {
             body: JSON.stringify(dataAsientos),
         });
 
-        const resultado = await response.json();
+        const resultado = await response.text();
         console.log(resultado);
 
-        if (resultado.exito) {
+        if (resultado.status) {
             alert("Datos enviados correctamente.");
             window.location.href = "asientos-tabla.php";
         } else {

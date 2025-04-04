@@ -92,20 +92,46 @@ class AsientoController
         // Recorrer los asientos dentro de 'datos'
         foreach ($asientos['datos'] as $asiento) {
             // Validar que 'filas' y 'rango' existan
-            if (!isset($asiento['filas']) || !is_array($asiento['filas'])) {
-                continue; // Saltar si no hay filas
-            }
-    
-            if (!isset($asiento['rango']) || !is_numeric($asiento['rango'])) {
-                continue; // Saltar si 'rango' no es un número
-            }
-    
-            foreach ($asiento['filas'] as $fila) {
-                for ($i = 0; $i < $asiento['rango']; $i++) {
-                    $asi = $i + 1;
-                    if (isset($asiento['limitaciones'][$i]) && $asiento['limitaciones'][$i] == $asi) {
-                        continue; // Saltar si el asiento está limitado
-                    } else {
+
+            
+
+            foreach ($asiento['caracteristicas'] as $caracteristica) {
+                
+                // Validar que 'fila' exista y no sea un array vacío
+                if (!isset($caracteristica['fila']) || !is_string($caracteristica['fila']) || empty($caracteristica['fila'])) {
+                    continue; // Saltar si no hay filas definidas
+                }
+            
+                    // Validar rangoInicio y rangoFin
+                    if (!isset($caracteristica['rangoInicio']) || !isset($caracteristica['rangoFin'])) {
+                        continue;
+                    }
+                    $fila = $caracteristica['fila'];
+                    for ($i = intval($caracteristica['rangoInicio']); $i <= intval($caracteristica['rangoFin']); $i++) {
+                        $asi = $i;
+            
+                        // Verificar si el asiento está limitado
+                        $estaLimitado = false;
+            
+                        foreach ($asiento['limitaciones'] as $limitacion) {
+                            if (
+                                isset($limitacion['letra'], $limitacion['limitaciones']) &&
+                                is_array($limitacion['limitaciones']) &&
+                                $limitacion['letra'] === $fila
+                            ) {
+                                // Asegurar que $limitacion['limitaciones'] sea un array válido antes de usar in_array()
+                                if (in_array($asi, $limitacion['limitaciones'])) {
+                                    $estaLimitado = true;
+                                    break;
+                                }
+                            }
+                        }
+            
+                        if ($estaLimitado) {
+                            continue; // Saltar si el asiento está limitado
+                        }
+            
+                        // Insertar el asiento si no está limitado
                         $this->asientoModel->insertarAsiento(
                             $recintoId,
                             $evento,
@@ -115,16 +141,49 @@ class AsientoController
                             $fila,
                             $asi
                         );
-                    }
+                    
                 }
             }
+            
+            
+            
         }
     
         // Después de procesar todos los asientos, retornar el estado
         return ['status' => true];
     }
     
+    public function reiniciarAsientosRecinto($evento, $funcion, $recintoId)
+    {
+        $resultado = $this->asientoModel->reiniciarAsientosRecinto($evento, $funcion, $recintoId);
     
+        // Verificar el resultado de la operación
+        if ($resultado) {
+            $matchedCount = $resultado['matched'];
+            $modifiedCount = $resultado['modified'];
+    
+            if ($matchedCount > 0) {
+                return [
+                    'status' => true,
+                    'message' => 'Asientos reiniciados correctamente.',
+                    'matched' => $matchedCount,
+                    'modified' => $modifiedCount,
+                ];
+            } else {
+                return [
+                    'status' => false,
+                    'message' => 'No se encontraron asientos para reiniciar.',
+                    'matched' => $matchedCount,
+                    'modified' => $modifiedCount,
+                ];
+            }
+        } else {
+            return [
+                'status' => 'error',
+                'message' => 'Error al intentar reiniciar los asientos.',
+            ];
+        }
+    }
     public function modificarEstado($id,$estado){
         $this->asientoModel->modificarEstado($id,$estado);
         return ['status'=>'modificar'];

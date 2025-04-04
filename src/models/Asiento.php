@@ -86,7 +86,38 @@ class Asiento
             return ['error' => 'El asiento ya fue reservado o no existe'];
         }
     }
-    
+    public function reiniciarAsientosRecinto($evento,$funcion,$recintoId){
+        $resultado = $this->collection->updateMany(
+            [
+                "funcion" => new ObjectId($funcion), 
+                "recinto_id" => new ObjectId($recintoId),
+                'evento_id' => new ObjectId($evento),
+                "vendido" => true,
+                "estado" => "Vendido",
+            ],
+            [
+                '$set' => [
+                    "vendido" => false,
+                    "estado" => "Disponible",
+                    "ocupado" => false,
+                    "activo" => false,
+                    "reservado_por" => null,
+                    "reservado_en" => null,
+                    "expiracion" => null,
+                    "vendido_en" => null,
+                ]
+            ]
+        );
+        
+        // Verificar el resultado
+        $matchedCount = $resultado->getMatchedCount(); // Número de documentos que coincidieron con el filtro
+        $modifiedCount = $resultado->getModifiedCount(); // Número de documentos que fueron modificados
+        
+        return [
+            'matched' => $matchedCount,
+            'modified' => $modifiedCount,
+        ];
+    }
     public function modificarEstado($id, $estado) {
         // Asegúrate de que el valor de $estado sea el que deseas (por ejemplo, "Disponible")
         $updatedAsiento = [

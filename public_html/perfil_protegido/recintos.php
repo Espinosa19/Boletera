@@ -102,8 +102,7 @@ require dirname(__DIR__,2) . "/src/routes.php";
             <label for="capacidad_zona_1">Capacidad:</label>
             <input type="number" id="capacidad_zona" name="capacidad_zona[]" required><br>
 
-            <label for="precio_default_1">Precio Default:</label>
-            <input type="number" id="precio_default" name="precio_default[]" required><br>
+            
 
             <label for="descripcion_1">Descripción:</label>
             <textarea id="descripcion" name="descripcion[]" required></textarea><br>

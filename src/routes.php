@@ -55,6 +55,14 @@ if(!empty($_SESSION['datos-token'])){
         $eventos=$eventoController->listar();
         $tipos = $tipoController->obtenerTiposAsientos();
     } 
+   
+    else if ($uri == 'perfil_protegido/asientos-reiniciar.php') {
+        $permisos = $tokenController->validarToken($_SESSION['datos-token']);
+        verificacionAcceso($permisos);
+        $asientos = $asientoController->obtenerTodos();
+        $eventos=$eventoController->listar();
+        $tipos = $tipoController->obtenerTiposAsientos();
+    } 
     else if ($uri == 'perfil_protegido/asientos-tabla.php') {
         $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
         $permisos = $tokenController->validarToken($_SESSION['datos-token']);
