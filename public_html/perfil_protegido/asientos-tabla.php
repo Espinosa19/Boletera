@@ -21,6 +21,8 @@ $asientosPaginados = array_slice($asientos, $offset, $asientosPorPagina);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+             <link rel="stylesheet" href="../assets/css/complementos.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <title>Gestión de Asientos</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
@@ -151,6 +153,8 @@ $asientosPaginados = array_slice($asientos, $offset, $asientosPorPagina);
             }
         }
     </style>
+            <?php include __DIR__ . '/complementos/header.php'; ?>
+
     <div class="container">
         <h1>Gestión de Asientos</h1>
         <input type="text" id="searchInput" placeholder="Buscar asiento..." onkeyup="filtrarAsientos()">

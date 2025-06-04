@@ -1,14 +1,17 @@
 <?php
 require_once dirname(__DIR__) . '/models/Evento.php';
 require_once dirname(__DIR__) . '/models/Recinto.php';
+require_once dirname(__DIR__) . '/models/Categoria.php';
 
 class EventoController {
     private $eventoModel;
     private $recintoModel;
+    private $categoriaModel;
 
     public function __construct() {
         $this->eventoModel = new Evento();
         $this->recintoModel = new Recinto(); // ← Corrección aquí
+        $this->categoriaModel = new Categoria();
     }
 
     /**
@@ -141,27 +144,37 @@ class EventoController {
     
     /**
      * Crear un nuevo evento
-     */
-    public function crear($nombre,$cate, $descripcion, $imagen, $recinto,$reco) {
-        if (empty($nombre) || empty($descripcion)) {
-            echo json_encode(['error' => 'Faltan datos obligatorios']);
-            return;
-        }
-
-        $datos = [
-            'nombre' => $nombre,
-            'categoria'=>$cate,
-            'descripcion' => $descripcion,
-            'imagen' => $imagen ?? '',
-            'recomendado'=>$reco,
-            'recintos' => $recinto ?? []
-            
-        ];
-
-        $resultado = $this->eventoModel->agregarEvento($datos);
-
-        return ['status' => 'create'];
+     */public function crear($nombre, $subcategoria, $descripcion, $imagen, $recinto, $reco) {
+    if (empty($nombre) || empty($descripcion) || empty($subcategoria)) {
+        echo json_encode(['error' => 'Faltan datos obligatorios']);
+        return;
     }
+
+    // Conexión a la colección de categorías
+    $categoria = $this->categoriaModel->buscarPorSubcategoria($subcategoria);
+
+    if (!$categoria) {
+        echo json_encode(['error' => 'Categoría no encontrada para esa subcategoría']);
+        return;
+    }
+
+    $categoriaId = $categoria['_id']; // ObjectId
+
+    $datos = [
+        'nombre' => $nombre,
+        'categoria' => $categoriaId,
+        'subcategoria' => $subcategoria,
+        'descripcion' => $descripcion,
+        'imagen' => $imagen ?? '',
+        'recomendado' => $reco,
+        'recintos' => $recinto ?? []
+    ];
+
+    $resultado = $this->eventoModel->agregarEvento($datos);
+
+    return ['status' => 'create'];
+}
+
 
     /**
      * Actualizar un evento

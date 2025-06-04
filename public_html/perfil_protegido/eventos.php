@@ -14,10 +14,17 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="../assets/css/complementos.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
     <title>Eventos</title>
     <link rel="stylesheet" href="../assets/css/eventos.css">
+    
 </head>
 <body>
+            <?php include __DIR__ . '/complementos/header.php'; ?>
+
+
     <div class="container">
         <h1>Eventos</h1>
         <button id="btn-agregar" onclick="mostrarFormularioCrear()">Agregar Evento</button>
@@ -27,41 +34,25 @@ require dirname(__DIR__,2) . "/src/routes.php";
             <form method="POST" enctype="multipart/form-data" onsubmit="guardarEvento(event)"> 
                 <label>Nombre:</label>
                 <input type="text" id="nombre" name="nombre" required>
-                <select name="categoria" id="categoria">
-                    <optgroup label="🎤 Conciertos y Música">
-                        <option value="pop">Pop</option>
-                        <option value="rock">Rock</option>
-                        <option value="electronica">Electrónica</option>
-                        <option value="regueton">Reguetón</option>
-                        <option value="musica_clasica">Música Clásica</option>
-                        <option value="jazz_blues">Jazz & Blues</option>
-                        <option value="regional_mexicano">Regional Mexicano</option>
-                        <option value="indie">Indie</option>
-                    </optgroup>
-                    <optgroup label="🎭 Teatro y Cultura">
-                        <option value="obras_teatro">Obras de Teatro</option>
-                        <option value="ballet">Ballet</option>
-                        <option value="opera">Ópera</option>
-                        <option value="standup_comedy">Stand-Up Comedy</option>
-                        <option value="exposiciones_arte">Exposiciones de Arte</option>
-                        <option value="festivales_culturales">Festivales Culturales</option>
-                    </optgroup>
-                    <optgroup label="⚽ Deportes">
-                        <option value="futbol">Fútbol</option>
-                        <option value="baloncesto">Baloncesto</option>
-                        <option value="beisbol">Béisbol</option>
-                        <option value="lucha_libre">Lucha Libre</option>
-                        <option value="automovilismo">Automovilismo</option>
-                        <option value="boxeo">Boxeo</option>
-                        <option value="artes_marciales">Artes Marciales</option>
-                    </optgroup>
-                    <optgroup label="🎡 Ferias y Festivales">
-                        <option value="festivales_gastronomicos">Festivales Gastronómicos</option>
-                        <option value="festivales_musica">Festivales de Música</option>
-                        <option value="ferias_tecnologicas">Ferias Tecnológicas</option>
-                        <option value="ferias_libro">Ferias del Libro</option>
-                    </optgroup>
-                </select>
+               <select name="categoria" id="categoria">
+    <?php if (!empty($categorias)): ?>
+        <option value="">Seleccione una categoría</option>
+        <?php foreach ($categorias as $categoria): ?>
+            <optgroup label="<?= htmlspecialchars($categoria['nombre']) ?>">
+                <?php if (isset($categoria['subcategorias']) ): ?>
+                    <?php foreach ($categoria['subcategorias'] as $subcategoria): ?>
+                        <option value="<?= htmlspecialchars($subcategoria) ?>">
+                            <?= htmlspecialchars($subcategoria) ?>
+                        </option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </optgroup>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <option value="">No hay categorías disponibles</option>
+    <?php endif; ?>
+</select>
+
 
                 <label>Descripción:</label>
                 <textarea id="descripcion" name="descripcion" required></textarea>
@@ -116,7 +107,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
                 <button type="submit" class="btn">Agregar</button>
                 <button type="button" onclick="cancelarFormulario()">Cancelar</button>
             </form>
-        </div>
     </div>
 
     <div id="eventos">
@@ -161,6 +151,7 @@ require dirname(__DIR__,2) . "/src/routes.php";
 </table>
 
     </div>
-<script src="../assets/js/proceso_event.js"></script>
+    </div>
+<script src="../assets/js/crud_evento.js"></script>
 </body>
 </html>

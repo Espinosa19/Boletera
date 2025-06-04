@@ -8,6 +8,9 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="../assets/css/complementos.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
     <title>Gestión de Tipos de Asientos</title>
     <style>
         /* Estilos generales */
@@ -128,13 +131,13 @@ require dirname(__DIR__,2) . "/src/routes.php";
     </style>
 </head>
 <body>
+        <?php include __DIR__ . '/complementos/header.php'; ?>
+
     <div class="container">
         <h2>Tipos de Asientos</h2>
         <!-- Botón para abrir el modal de nuevo asiento -->
         <button class="btn" id="nuevoAsientoBtn">Nuevo Asiento</button>
-        <?php
-            echo json_encode($permisos);
-        ?>
+    
         <table class="table">
             <thead>
                 <tr>

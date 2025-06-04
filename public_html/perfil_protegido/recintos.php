@@ -10,10 +10,15 @@ require dirname(__DIR__,2) . "/src/routes.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Recintos</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/complementos.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="../assets/css/tablas.css">
+
 </head>
 <body>
+    <?php include __DIR__ . '/complementos/header.php'; ?>
     <div class="container">
+
         <h1>Gestión de Recintos</h1>
 
         
@@ -125,121 +130,10 @@ require dirname(__DIR__,2) . "/src/routes.php";
 </html>
 
 <style>
- body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        /* Estilos para la tabla */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
+ 
         /* Estilos para el formulario */
-        #recintoForm {
-            display: none; /* Oculta el formulario inicialmente */
-            margin-bottom: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        select{
-            width:100%;
-            height:35px;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="checkbox"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #cancelButton {
-            background-color: #f44336; /* Color rojo para el botón de cancelar */
-        }
-
-        #cancelButton:hover {
-            background-color: #d32f2f; /* Color rojo más oscuro al pasar el mouse */
-        }
-/* Media queries para dispositivos mviles */
-@media (max-width: 768px) {
-    .container {
-        width: 95%;
-    }
-
-    form {
-        flex-direction: column;
-    }
-
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
-
-    table thead {
-        display: none;
-    }
-
-    table tr {
-        margin-bottom: 15px;
-    }
-
-    table td {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-        border: none;
-        border-bottom: 1px solid #ddd;
-    }
-
-    table td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        color: #333;
-    }
-}
+      
+    
+      
 
 </style>

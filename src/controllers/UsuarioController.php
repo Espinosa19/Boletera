@@ -11,7 +11,13 @@ class UsuarioController {
     public function obtenerUsuarios() {
         return $this->usuarioModel->obtenerUsuarios();
     }
-
+    public function listarUsuariosConAcceso(){
+        $usuarios = $this->usuarioModel->listarUsuariosConAcceso();
+        if ($usuarios) {
+            return $usuarios;
+        }
+        return json_encode(["error" => "No se encontraron usuarios"]);
+    }
     public function obtenerUsuarioPorId($id) {
         $usuario = $this->usuarioModel->obtenerUsuarioPorId($id);
         if ($usuario) {
@@ -27,7 +33,15 @@ class UsuarioController {
         }
         return json_encode(["error" => "Usuario no encontrado"]);
     }
-
+    public function agregarUsuario($nombre, $email, $telefono, $role) {
+        return $this->usuarioModel->agregarUsuario($nombre, $email, $telefono, $role);
+    }
+    public function actualizarUsuario($id, $nombre, $email, $telefono, $role) {
+        return $this->usuarioModel->actualizarUsuario($id, $nombre, $email, $telefono, $role);
+    }
+    public function eliminarUsuario($id) {
+        return $this->usuarioModel->eliminarUsuario($id);
+    }
     
 }
 ?>

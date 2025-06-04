@@ -9,6 +9,7 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Gestión de Recinto</title>
     <style>
         body {

@@ -7,6 +7,8 @@ require_once __DIR__ . '/controllers/TipoAsientoController.php';
 require_once __DIR__ . '/controllers/AsientoController.php';
 require_once __DIR__ . '/controllers/TokenController.php';
 require_once __DIR__ . '/controllers/CompraController.php';
+require_once __DIR__ . '/controllers/CategoriaController.php';
+require_once __DIR__ . '/controllers/UsuarioController.php';
 
 $basePath = "/administrador/public_html";
 $eventoController = new EventoController();
@@ -16,6 +18,8 @@ $tipoController = new TipoAsientoController();
 $asientoController = new AsientoController();
 $tokenController = new TokenController();
 $compraController = new CompraController();
+$categoriasController = new CategoriaController();
+$usuarioController = new UsuarioController();
 $uri = trim(str_replace($basePath, '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)), "/");
 
 if(!empty($_SESSION['datos-token'])){
@@ -31,6 +35,7 @@ if(!empty($_SESSION['datos-token'])){
         $resultados = $eventoController->listarEventos();
         $eventos = $resultados['eventos'];
         $recintos = $resultados['recintos'];
+        $categorias = $categoriasController->listarCategorias();
     } 
     // Recintos
     else if ($uri == 'perfil_protegido/recintos.php') {
@@ -55,7 +60,12 @@ if(!empty($_SESSION['datos-token'])){
         $eventos=$eventoController->listar();
         $tipos = $tipoController->obtenerTiposAsientos();
     } 
-   
+   else if ($uri == 'perfil_protegido/categorias.php') {
+        $permisos = $tokenController->validarToken($_SESSION['datos-token']);
+        verificacionAcceso($permisos);
+        $categorias = $categoriasController->listarCategorias();
+
+    }
     else if ($uri == 'perfil_protegido/asientos-reiniciar.php') {
         $permisos = $tokenController->validarToken($_SESSION['datos-token']);
         verificacionAcceso($permisos);
@@ -76,6 +86,12 @@ if(!empty($_SESSION['datos-token'])){
         verificacionAcceso($permisos);
         $eventos = $eventoController->listar();
     } 
+    else if($uri == "perfil_protegido/usuarios.php"){
+        $permisos = $tokenController->validarToken($_SESSION['datos-token']);
+        verificacionAcceso($permisos);
+        $usuarios = $usuarioController->listarUsuariosConAcceso();
+
+    }
     // Manejo de error 404
     else {
         http_response_code(404);

@@ -14,7 +14,7 @@ h1 {
 
 /* Estilos del contenedor principal */
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: auto;
     background-color: #ffffff;
     padding: 30px;

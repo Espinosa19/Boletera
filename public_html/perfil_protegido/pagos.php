@@ -8,98 +8,17 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="../assets/css/complementos.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="../assets/css/tablas.css">
+
     <title>CRUD Pagos</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
         
-        h1, h2 {
-            text-align: center;
-            color: #333;
-        }
-        
-        #toggleFormButton {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        
-        #toggleFormButton:hover {
-            background-color: #0056b3;
-        }
-        
-        form {
-            background: white;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-        
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-        }
-        
-        input, button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        
-        button {
-            background-color: #28a745;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-        }
-        
-        button:hover {
-            background-color: #218838;
-        }
-        
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-        
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        tr:hover {
-            background-color: #f1f1f1;
-        }
     </style>
 </head><body>
+        <?php include __DIR__ . '/complementos/header.php'; ?>
+
     <h1>Gestión de Pagos</h1>
 
     

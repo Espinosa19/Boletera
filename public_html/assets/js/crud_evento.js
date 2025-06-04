@@ -281,6 +281,7 @@ function agregarFuncion(button) {
         if (!response.ok) throw new Error('Error al guardar evento');
 
         const result = await response.json(); // Asume que el servidor responde con JSON
+        console.log(result);
         alert(result.success || result.error);
         cargarEventos();
         cancelarFormulario();
