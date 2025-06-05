@@ -129,64 +129,7 @@ function mostrarFormularioCrear() {
 
  eventoEnEdicion = id;
  document.getElementById('eventos').style.display = 'none';
-}async function cargarEventos() {
-    try {
-        const response = await fetch('./apis/apie.php', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json", // Enviar como JSON
-            }
-        });
-        const data = await response.json();  // Almacenamos toda la respuesta
-        // Ahora accedemos a la propiedad 'eventos' que es el array
-        const eventos = data.eventos;  // Aquí accedemos correctamente al array de eventos
-
-        const tbody = document.getElementById('eventos').querySelector('tbody');
-        tbody.innerHTML = '';
-
-        eventos.forEach(evento => {
-            // Procesar recintos y funciones
-            const recintosHTML = evento.recintos.map(recinto => {
-                const funcionesHTML = recinto.funciones.map(funcion => {
-                    const fechaInicio = new Date(funcion.fecha_inicio);
-                    const fechaFin = new Date(funcion.fecha_fin);
-
-                        return `
-                            <div>
-                            ${fechaInicio.toISOString().slice(0, 16)} - 
-                                ${fechaFin.toLocaleString('es-MX')}
-                            </div>
-                        `;
-                    
-                }).join('');
-
-                return `
-                    <div>
-                        Recinto ID: ${recinto.nombre}
-                        <div>Funciones:</div>
-                        ${funcionesHTML}
-                    </div>
-                `;
-            }).join('');
-
-            const row = `
-                <tr>
-                    <td>${evento.nombre}</td>
-                    <td>${evento.descripcion}</td>
-                    <td>${recintosHTML}</td>
-                    <td>
-                        <button onclick="editarEvento('${evento._id}')">Editar</button>
-                        <button onclick="eliminarEvento('${evento._id}')">Eliminar</button>
-                    </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
-    } catch (error) {
-        console.error('Error al cargar eventos:', error);
-    }
 }
-
 
 async function editarEvento(id) {
  document.getElementById('formulario').style.display = 'block';
@@ -282,9 +225,16 @@ function agregarFuncion(button) {
         if (!response.ok) throw new Error('Error al guardar evento');
 
         const result = await response.json(); // Asume que el servidor responde con JSON
-        console.log(result);
-        alert(result.success || result.error);
-        cargarEventos();
+        if( result.status=="create"){
+            alert('Evento creado exitosamente');
+            location.reload(); // Recargar la página para ver el nuevo evento
+        }else if(result.status=="update"){
+            alert('Evento actualizado exitosamente');
+            location.reload(); // Recargar la página para ver los cambios
+        }
+        else{
+            throw new Error('Error al guardar evento');
+        }
         cancelarFormulario();
     } catch (error) {
         console.error('Error al guardar evento:', error);
