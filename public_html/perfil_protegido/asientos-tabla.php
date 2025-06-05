@@ -21,138 +21,13 @@ $asientosPaginados = array_slice($asientos, $offset, $asientosPorPagina);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-             <link rel="stylesheet" href="../assets/css/complementos.css">
-      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/complementos_es.css">
+                 <link rel="stylesheet" href="../assets/css/tablas_es.css">
+    <link rel="stylesheet" href="../assets/css/estilos_es.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <title>Gestión de Asientos</title>
-    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-<style>
-        /* Estilos generales */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            margin: 0;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        /* Barra de búsqueda */
-        #searchInput {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        /* Tabla */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 14px;
-            text-align: center;
-        }
-
-        th {
-            background: #007bff;
-            color: white;
-            font-size: 16px;
-        }
-
-        tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-
-        tr:hover {
-            background: #f1f1f1;
-        }
-
-        /* Botones */
-        .btn {
-            padding: 10px 15px;
-            text-align: center;
-            font-size: 14px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-
-        .btn-edit {
-            background-color: #ffc107;
-            color: black;
-        }
-
-        .btn-edit:hover {
-            background-color: #e0a800;
-        }
-
-        /* Estilos para select */
-        select {
-            padding: 8px;
-            font-size: 14px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            outline: none;
-            background: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            th, td {
-                padding: 10px;
-                font-size: 14px;
-            }
-            .btn {
-                padding: 8px;
-                font-size: 12px;
-            }
-        }
-    </style>
             <?php include __DIR__ . '/complementos/header.php'; ?>
 
     <div class="container">
@@ -181,7 +56,7 @@ $asientosPaginados = array_slice($asientos, $offset, $asientosPorPagina);
                     <td><?php echo htmlspecialchars($asiento['fila'] ?? "Sin fila"); ?></td>
                     <td><?php echo htmlspecialchars($asiento['numero'] ?? "Sin asiento"); ?></td>
                     <td>
-                        <form method="POST" action="./apis/apia.php">
+                        <form method="POST" style="display:block" action="./apis/apia.php">
                             <select name="nuevo_estado">
                                 <option value="Disponible" <?php echo isset($asiento['estado']) && $asiento['estado'] == 'Disponible' ? 'selected' : ''; ?>>Disponible</option>
                                 <option value="Reservado" <?php echo isset($asiento['estado']) && $asiento['estado'] == 'Reservado' ? 'selected' : ''; ?>>Reservado</option>
@@ -191,7 +66,7 @@ $asientosPaginados = array_slice($asientos, $offset, $asientosPorPagina);
                         </form>
                     </td>
                     <td>
-                        <form method="POST" action="./apis/apia.php">
+                        <form method="POST" style="display:flex" action="./apis/apia.php">
                             <input type="hidden" name="_method" value="DELETE">
                             <button class="btn btn-danger" name="id" value="<?php echo $asiento['_id']; ?>">Eliminar</button>
                         </form>

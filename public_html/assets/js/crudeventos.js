@@ -42,6 +42,7 @@ function mostrarFormularioCrear() {
      }function mostrarFormularioActualizar(id, nombre,categoria,descripcion, recintos,recomendado) {
         document.getElementById("primer-button").style.display="none"
  document.getElementById('formulario').hidden = false;
+ document.getElementById("formulario").style.display = 'flex';
  document.querySelector('.recinto-header').hidden = true;
  document.querySelector('#titulo-re').hidden = true;
  document.getElementById('titulo-formulario').innerText = 'Modificar Evento';

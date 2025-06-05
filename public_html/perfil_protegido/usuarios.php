@@ -10,9 +10,10 @@ require dirname(__DIR__, 2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <link rel="stylesheet" href="../assets/css/complementos.css">
+         <link rel="stylesheet" href="../assets/css/complementos_es.css">
+         <link rel="stylesheet" href="../assets/css/estilos_es.css">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="../assets/css/tablas.css">
+            <link rel="stylesheet" href="../assets/css/tablas_es.css">
 
     <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="styles.css">

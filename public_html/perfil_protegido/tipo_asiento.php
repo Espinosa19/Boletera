@@ -8,127 +8,13 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="../assets/css/complementos.css">
+     <link rel="stylesheet" href="../assets/css/complementos_es.css">
+                 <link rel="stylesheet" href="../assets/css/tablas_es.css">
+    <link rel="stylesheet" href="../assets/css/estilos_es.css">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <title>Gestión de Tipos de Asientos</title>
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th, .table td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        .btn {
-            padding: 8px 12px;
-            cursor: pointer;
-            border: none;
-            color: white;
-            background-color: #007bff;
-            font-size: 16px;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-        }
-
-        /* Estilos del modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .modal {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 400px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .btn-close {
-            cursor: pointer;
-            background-color: transparent;
-            border: none;
-            font-size: 18px;
-        }
-
-        .modal-body {
-            margin-top: 20px;
-        }
-
-        .modal-body input, .modal-body select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        /* Animación de apertura del modal */
-        .open {
-            display: flex;
-        }
-
-        .btn-close:focus {
-            outline: none;
-        }
-    </style>
+   
 </head>
 <body>
         <?php include __DIR__ . '/complementos/header.php'; ?>

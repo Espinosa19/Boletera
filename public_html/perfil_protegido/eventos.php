@@ -14,11 +14,12 @@ require dirname(__DIR__,2) . "/src/routes.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="../assets/css/complementos.css">
+          <link rel="stylesheet" href="../assets/css/complementos_es.css">
+                 <link rel="stylesheet" href="../assets/css/tablas_es.css">
+    <link rel="stylesheet" href="../assets/css/estilos_es.css">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <title>Eventos</title>
-    <link rel="stylesheet" href="../assets/css/eventos.css">
     
 </head>
 <body>
@@ -28,10 +29,10 @@ require dirname(__DIR__,2) . "/src/routes.php";
     <div class="container">
         <h1>Eventos</h1>
         <button id="btn-agregar" onclick="mostrarFormularioCrear()">Agregar Evento</button>
-        
-        <div id="formulario" class="formulario" hidden style="display:none">
+
+        <div id="formulario" class="formulario" hidden>
             <h2 id="titulo-formulario">Agregar Evento</h2>
-            <form method="POST" enctype="multipart/form-data" onsubmit="guardarEvento(event)"> 
+            <form method="POST" style="display: block;" enctype="multipart/form-data" onsubmit="guardarEvento(event)"> 
                 <label>Nombre:</label>
                 <input type="text" id="nombre" name="nombre" required>
                <select name="categoria" id="categoria">
@@ -114,7 +115,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
     <thead>
         <tr>
             <th>Nombre</th>
-            <th>Descripción</th>
             <th>Recintos</th>
             <th>Acciones</th>
         </tr>
@@ -123,7 +123,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
         <?php foreach($eventos as $evento): ?>
             <tr>
                 <td><?php echo htmlspecialchars($evento['nombre']); ?></td>
-                <td><?php echo htmlspecialchars($evento['descripcion']); ?></td>
                 <td>
                     <?php 
                     if (!empty($evento['recintos'])) {
@@ -152,6 +151,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
 
     </div>
     </div>
-<script src="../assets/js/crud_evento.js"></script>
+<script src="../assets/js/crudeventos.js"></script>
 </body>
 </html>
