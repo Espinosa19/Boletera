@@ -151,6 +151,6 @@ require dirname(__DIR__,2) . "/src/routes.php";
 
     </div>
     </div>
-<script src="../assets/js/crudeventos.js"></script>
+<script src="../assets/js/crudeventos_.js"></script>
 </body>
 </html>

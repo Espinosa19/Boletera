@@ -225,6 +225,7 @@ function agregarFuncion(button) {
         if (!response.ok) throw new Error('Error al guardar evento');
 
         const result = await response.json(); // Asume que el servidor responde con JSON
+        console.log('Resultado del servidor:', result);
         if( result.status=="create"){
             alert('Evento creado exitosamente');
             location.reload(); // Recargar la página para ver el nuevo evento

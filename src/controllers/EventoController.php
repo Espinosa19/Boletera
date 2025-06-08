@@ -144,12 +144,21 @@ class EventoController {
     
     /**
      * Crear un nuevo evento
-     */public function crear($nombre, $subcategoria, $descripcion, $imagen, $recinto, $reco) {
-    if (empty($nombre) || empty($descripcion) || empty($subcategoria)) {
-        echo json_encode(['error' => 'Faltan datos obligatorios']);
-        return;
-    }
+     */public function crear($nombre, $subcategoria, $descripcion, $imagen, $recintos, $reco) {
+  if (empty(trim($nombre)) || empty(trim($descripcion)) || empty(trim($subcategoria))) {
+    echo json_encode(['error' => 'Faltan datos obligatorios']);
+    return;
+}
 
+    foreach ($recintos as $recinto) {
+        $idRecinto = $recinto['id'] ?? null;
+        if (empty($idRecinto)) {
+            echo json_encode(['error' => 'Falta el ID del recinto']);
+            return;
+        }
+        $resultado= $this->recintoModel->obtenerRecintoPorId($idRecinto);
+        $recinto['ciudad'] = $resultado['ciudad'] ?? '';
+    }
     // Conexión a la colección de categorías
     $categoria = $this->categoriaModel->buscarPorSubcategoria($subcategoria);
 
@@ -167,7 +176,7 @@ class EventoController {
         'descripcion' => $descripcion,
         'imagen' => $imagen ?? '',
         'recomendado' => $reco,
-        'recintos' => $recinto ?? []
+        'recintos' => $recintos ?? []
     ];
 
     $resultado = $this->eventoModel->agregarEvento($datos);
@@ -179,20 +188,29 @@ class EventoController {
     /**
      * Actualizar un evento
      */
-    public function actualizarEvento($id, $nombre, $cate,$descripcion, $imagen, $recinto,$reco) {
+    public function actualizarEvento($id, $nombre, $cate,$descripcion, $imagen, $recintos,$reco) {
         if (empty($id) || empty($nombre) || empty($descripcion)) {
             echo json_encode(['error' => 'Faltan datos obligatorios']);
             http_response_code(400);
             return;
         }
-
+        foreach ($recintos as $recinto) {
+            $idRecinto = $recinto['id'] ?? null;
+            if (empty($idRecinto)) {
+                echo json_encode(['error' => 'Falta el ID del recinto']);
+                return;
+        }
+        $resultado= $this->recintoModel->obtenerRecintoPorId($idRecinto);
+        $recinto['ciudad'] = $resultado['ciudad'] ?? '';
+    }
+        
         $datos = [
             'nombre' => $nombre,
             'categoria'=>$cate,
             'descripcion' => $descripcion,
             'recomendado'=>$reco,
             'imagen' => $imagen ?? '',
-            'recintos' => $recinto ?? []
+            'recintos' => $recintos ?? []
         ];
 
         $resultado = $this->eventoModel->actualizarEvento($id, $datos);
